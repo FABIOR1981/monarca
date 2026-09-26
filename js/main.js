@@ -43,7 +43,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 return response.json();
             })
             .then(data => {
-                const imagenes = data.resources || [];
+                //const imagenes = data.resources || [];
+                const imagenes = (data.resources || []).reverse();
 
                 if (imagenes.length === 0) {
                     galeriaDinamica.innerHTML = '<p style="grid-column: 1 / -1; text-align: center; color: #666;">Próximamente compartiremos más momentos.</p>';
