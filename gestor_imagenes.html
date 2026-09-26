@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestor de Imágenes - Proyecto Monarca</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+        .preview-canvas { max-width: 100%; height: auto; }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen p-6 font-sans">
+    <div class="max-w-6xl mx-auto">
+        <header class="mb-8 border-b border-slate-800 pb-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+                <h1 class="text-3xl font-bold tracking-tight text-amber-400">ESPACIA / Monarca</h1>
+                <p class="text-slate-400 text-sm mt-1">Gestor y optimizador de imágenes (Conversión a WebP con fecha automática)</p>
+            </div>
+            <div class="flex items-center gap-3 bg-slate-800 p-3 rounded-lg border border-slate-700">
+                <label for="globalCategory" class="text-sm font-medium text-slate-300">Tipo predeterminado:</label>
+                <select id="globalCategory" class="bg-slate-900 border border-slate-600 rounded px-2 py-1 text-sm text-amber-300 focus:outline-none focus:border-amber-500">
+                    <option value="instalaciones">Instalaciones (Personalizada)</option>
+                    <option value="galeria">Galería (Genérica)</option>
+                </select>
+            </div>
+        </header>
+
+        <!-- Zona de Carga -->
+        <div class="mb-8">
+            <label for="fileInput" class="border-2 border-dashed border-slate-700 hover:border-amber-500 bg-slate-800/50 hover:bg-slate-800 rounded-xl p-8 flex flex-col items-center justify-center cursor-pointer transition-all duration-200 group">
+                <svg class="w-12 h-12 text-slate-500 group-hover:text-amber-400 mb-3 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                </svg>
+                <span class="text-sm font-medium text-slate-300 group-hover:text-amber-300">Arrastra tus imágenes aquí o <span class="text-amber-400 underline">haz clic para buscar</span></span>
+                <span class="text-xs text-slate-500 mt-1">Soporta múltiples archivos PNG, JPG, WEBP</span>
+                <input type="file" id="fileInput" multiple accept="image/*" class="hidden">
+            </label>
+        </div>
+
+        <!-- Acciones Globales -->
+        <div id="batchActions" class="hidden mb-6 flex justify-between items-center bg-slate-800 p-4 rounded-lg border border-slate-700">
+            <span id="counterText" class="text-sm text-slate-300 font-medium">0 imágenes cargadas</span>
+            <button id="downloadAllBtn" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-5 py-2 rounded-lg text-sm transition-colors shadow-lg cursor-pointer">
+                Descargar todas procesadas (.WebP)
+            </button>
+        </div>
+
+        <!-- Contenedor de Tarjetas -->
+        <div id="cardsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+    </div>
+
+    <script>
+        const fileInput = document.getElementById('fileInput');
+        const cardsContainer = document.getElementById('cardsContainer');
+        const globalCategory = document.getElementById('globalCategory');
+        const batchActions = document.getElementById('batchActions');
+        const counterText = document.getElementById('counterText');
+        const downloadAllBtn = document.getElementById('downloadAllBtn');
+
+        let imageFiles = [];
+
+        fileInput.addEventListener('change', (e) => {
+            const files = Array.from(e.target.files);
+            files.forEach(file => {
+                if (!file.type.startsWith('image/')) return;
+                
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const randomStr = Math.random().toString(36);
+                        const imgData = {
+                            id: randomStr.substring(2, 9),
+                            fileObj: file,
+                            imgElement: img,
+                            originalName: file.name.substring(0, file.name.lastIndexOf('.')) || file.name,
+                            shortName: sanitizeName(file.name.substring(0, file.name.lastIndexOf('.')) || file.name),
+                            category: globalCategory.value,
+                            customLegend: globalCategory.value === 'instalaciones' ? 'Instalaciones' : 'Galería Monarca',
+                            dateStr: getFormattedDate(file.lastModified ? new Date(file.lastModified) : new Date())
+                        };
+                        imageFiles.push(imgData);
+                        renderCards();
+                    };
+                    img.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
+            fileInput.value = '';
+        });
+
+        globalCategory.addEventListener('change', () => {
+            const val = globalCategory.value;
+            imageFiles.forEach(item => {
+                item.category = val;
+                item.customLegend = val === 'instalaciones' ? 'Instalaciones' : 'Galería Monarca';
+            });
+            renderCards();
+        });
+
+        function sanitizeName(name) {
+            return name.toLowerCase()
+                .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+                .replace(/[^a-z0-9]/g, '_')
+                .replace(/_+/g, '_')
+                .substring(0, 15);
+        }
+
+        function getFormattedDate(dateObj) {
+            const yy = String(dateObj.getFullYear()).slice(-2);
+            const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
+            const dd = String(dateObj.getDate()).padStart(2, '0');
+            const hh = String(dateObj.getHours()).padStart(2, '0');
+            const min = String(dateObj.getMinutes()).padStart(2, '0');
+            return `${yy}${mm}${dd}_${hh}${min}`;
+        }
+
+        function renderCards() {
+            cardsContainer.innerHTML = '';
+            if (imageFiles.length > 0) {
+                batchActions.classList.remove('hidden');
+                counterText.textContent = `${imageFiles.length} ${imageFiles.length === 1 ? 'imagen cargada' : 'imágenes cargadas'}`;
+            } else {
+                batchActions.classList.add('hidden');
+            }
+
+            imageFiles.forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = "bg-slate-800 rounded-xl border border-slate-700 p-4 flex flex-col gap-3 shadow-md";
+                
+                const finalGeneratedName = `${item.dateStr}_${item.shortName || 'monarca'}.webp`;
+
+                card.innerHTML = `
+                    <div class="relative rounded-lg overflow-hidden bg-slate-950 aspect-video flex items-center justify-center border border-slate-700">
+                        <canvas id="canvas-${index}" class="preview-canvas object-contain w-full h-full"></canvas>
+                    </div>
+                    <div class="flex flex-col gap-2 text-sm">
+                        <div>
+                            <label class="text-xs text-slate-400">Nombre corto:</label>
+                            <input type="text" value="${item.shortName}" data-index="${index}" class="short-name-input w-full bg-slate-900 border border-slate-600 rounded px-2 py-1 text-slate-200 text-xs focus:outline-none focus:border-amber-500">
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="text-xs text-slate-400">Tipo:</label>
+                                <select data-index="${index}" class="category-select w-full bg-slate-900 border border-slate-600 rounded px-2 py-1 text-slate-200 text-xs focus:outline-none focus:border-amber-500">
+                                    <option value="instalaciones" ${item.category === 'instalaciones' ? 'selected' : ''}>Instalaciones</option>
+                                    <option value="galeria" ${item.category === 'galeria' ? 'selected' : ''}>Galería</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="text-xs text-slate-400">Leyenda:</label>
+                                <input type="text" value="${item.customLegend}" data-index="${index}" class="legend-input w-full bg-slate-900 border border-slate-600 rounded px-2 py-1 text-slate-200 text-xs focus:outline-none focus:border-amber-500">
+                            </div>
+                        </div>
+                        <div class="text-xs text-amber-400/90 truncate mt-1 bg-slate-900/60 p-1.5 rounded border border-slate-800">
+                            <span class="text-slate-500">Archivo:</span> ${finalGeneratedName}
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center pt-2 border-t border-slate-700/60 mt-auto">
+                        <button data-index="${index}" class="delete-btn text-rose-400 hover:text-rose-300 text-xs font-medium cursor-pointer">Eliminar</button>
+                        <button data-index="${index}" class="download-single-btn bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-3 py-1.5 rounded text-xs transition-colors cursor-pointer">Descargar WebP</button>
+                    </div>
+                `;
+
+                cardsContainer.appendChild(card);
+                drawPreview(index);
+            });
+
+            attachEvents();
+        }
+
+        function drawPreview(index) {
+            const item = imageFiles[index];
+            const canvas = document.getElementById(`canvas-${index}`);
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+
+            const img = item.imgElement;
+            canvas.width = img.naturalWidth;
+            canvas.height = img.naturalHeight;
+
+            ctx.drawImage(img, 0, 0);
+
+            if (item.customLegend.trim() !== '') {
+                const fontSize = Math.max(16, Math.floor(canvas.height * 0.04));
+                ctx.font = `bold ${fontSize}px sans-serif`;
+                ctx.fillStyle = "rgba(0, 0, 0, 0.6)";
+                
+                const textMetrics = ctx.measureText(item.customLegend);
+                const padding = fontSize * 0.8;
+                const boxWidth = textMetrics.width + (padding * 2);
+                const boxHeight = fontSize * 1.6;
+                const x = (canvas.width - boxWidth) / 2;
+                const y = canvas.height - boxHeight - (fontSize * 0.8);
+
+                ctx.beginPath();
+                ctx.roundRect(x, y, boxWidth, boxHeight, 8);
+                ctx.fill();
+
+                ctx.fillStyle = "#ffffff";
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+                ctx.fillText(item.customLegend, canvas.width / 2, y + (boxHeight / 2));
+            }
+        }
+
+        function attachEvents() {
+            document.querySelectorAll('.short-name-input').forEach(input => {
+                input.addEventListener('input', (e) => {
+                    const idx = e.target.dataset.index;
+                    imageFiles[idx].shortName = sanitizeName(e.target.value);
+                    renderCardsNoLossFocus(idx, e.target);
+                });
+            });
+
+            document.querySelectorAll('.legend-input').forEach(input => {
+                input.addEventListener('input', (e) => {
+                    const idx = e.target.dataset.index;
+                    imageFiles[idx].customLegend = e.target.value;
+                    drawPreview(idx);
+                });
+            });
+
+            document.querySelectorAll('.category-select').forEach(select => {
+                select.addEventListener('change', (e) => {
+                    const idx = e.target.dataset.index;
+                    imageFiles[idx].category = e.target.value;
+                    if(e.target.value === 'instalaciones') {
+                        imageFiles[idx].customLegend = 'Instalaciones';
+                    } else {
+                        imageFiles[idx].customLegend = 'Galería Monarca';
+                    }
+                    renderCards();
+                });
+            });
+
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const idx = e.target.dataset.index;
+                    imageFiles.splice(idx, 1);
+                    renderCards();
+                });
+            });
+
+            document.querySelectorAll('.download-single-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const idx = e.target.dataset.index;
+                    downloadItem(idx);
+                });
+            });
+
+            downloadAllBtn.onclick = () => {
+                imageFiles.forEach((_, idx) => {
+                    setTimeout(() => downloadItem(idx), idx * 250);
+                });
+            };
+        }
+
+        function renderCardsNoLossFocus(activeIdx, targetElement) {
+            const cursorPosition = targetElement.selectionStart;
+            renderCards();
+            const newInputs = document.querySelectorAll('.short-name-input');
+            if (newInputs[activeIdx]) {
+                newInputs[activeIdx].focus();
+                newInputs[activeIdx].setSelectionRange(cursorPosition, cursorPosition);
+            }
+        }
+
+        function downloadItem(index) {
+            const item = imageFiles[index];
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = item.imgElement.naturalWidth;
+            canvas.height = item.imgElement.naturalHeight;
+            ctx.drawImage(item.imgElement, 0, 0);
+
+            if (item.customLegend.trim() !== '') {
+                const fontSize = Math.max(16, Math.floor(canvas.height * 0.04));
+                ctx.font = `bold ${fontSize}px sans-serif`;
+                ctx.fillStyle = "rgba(0, 0, 0, 0.6)";
+                const textMetrics = ctx.measureText(item.customLegend);
+                const padding = fontSize * 0.8;
+                const boxWidth = textMetrics.width + (padding * 2);
+                const boxHeight = fontSize * 1.6;
+                const x = (canvas.width - boxWidth) / 2;
+                const y = canvas.height - boxHeight - (fontSize * 0.8);
+
+                ctx.beginPath();
+                ctx.roundRect(x, y, boxWidth, boxHeight, 8);
+                ctx.fill();
+
+                ctx.fillStyle = "#ffffff";
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+                ctx.fillText(item.customLegend, canvas.width / 2, y + (boxHeight / 2));
+            }
+
+            canvas.toBlob((blob) => {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${item.dateStr}_${item.shortName || 'monarca'}.webp`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }, 'image/webp', 0.85);
+        }
+    </script>
+</body>
+</html>
