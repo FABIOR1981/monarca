@@ -205,14 +205,15 @@ section {
     padding-bottom: 1.5rem;
 }
 
-/* Control estricto del tamaño de la foto del director */
+/* Control y diseño adaptable para la foto del director */
 .director-img {
-    width: 90px !important;
-    height: 90px !important;
-    min-width: 90px !important;
-    min-height: 90px !important;
-    border-radius: 50% !important;
+    width: 100px !important;
+    height: 120px !important;
+    min-width: 100px !important;
+    min-height: 120px !important;
+    border-radius: 12px !important; /* Bordes redondeados suaves en vez de círculo */
     object-fit: cover !important;
+    object-position: top center !important; /* Asegura que la cara y la cabeza queden siempre visibles */
     border: 3px solid var(--accent);
     flex-shrink: 0;
 }
