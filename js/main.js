@@ -51,8 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="gallery-item">
                         <img src="img/galeria/${img}" alt="Actividad en Monarca" loading="lazy">
                         <div class="gallery-overlay">
-                            <h3>Actividades</h3>
-                            <p>Compartiendo momentos.</p>
+                           
                         </div>
                     </div>
                 `).join('');
