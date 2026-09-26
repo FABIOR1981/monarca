@@ -210,7 +210,7 @@ section {
 }
 
 /* =========================================
-   SECCIÓN SERVICIOS (Diseño Mejorado)
+   SECCIÓN SERVICIOS
    ========================================= */
 .services-container {
     display: grid;
@@ -228,6 +228,7 @@ section {
     transition: var(--transition);
     display: flex;
     flex-direction: column;
+    justify-content: flex-start; /* Agrupa todo el texto arriba y deja el espacio al final */
 }
 
 .service-block:hover {
@@ -269,7 +270,8 @@ section {
 .service-list {
     list-style: none;
     padding: 0;
-    margin-top: auto;
+    margin-top: 0.5rem;
+    margin-bottom: 0;
 }
 
 .service-list li {
@@ -490,7 +492,6 @@ footer {
     .hero-content h1 {
         font-size: 2.8rem;
     }
-    /* Ajustes responsivos para Servicios */
     .services-container {
         grid-template-columns: 1fr;
         padding: 0;
