@@ -4,12 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Monarca | Residencial Geriátrico</title>
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-    <!-- FontAwesome para iconos -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Enlace al archivo CSS externo -->
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
@@ -25,6 +21,7 @@
                 <li><a href="#inicio">Inicio</a></li>
                 <li><a href="#mision-vision">Nosotros</a></li>
                 <li><a href="#valores">Valores</a></li>
+                <li><a href="#servicios">Servicios</a></li>
                 <li><a href="#instalaciones">Instalaciones</a></li>
                 <li><a href="#galeria">Galería</a></li>
                 <li><a href="#contacto">Contacto</a></li>
@@ -94,8 +91,63 @@
         </div>
     </section>
 
-    <!-- Galería de Instalaciones (Fijas) -->
-    <section id="instalaciones" class="gallery-container">
+    <!-- Servicios -->
+    <section id="servicios" style="background-color: var(--bg-light);">
+        <h2 class="section-title">Nuestros Servicios</h2>
+        <div class="services-container">
+            
+            <!-- Instalaciones y Comodidades -->
+            <div class="service-block">
+                <h3><i class="fas fa-home"></i> Instalaciones</h3>
+                <p>Un espacio pensado para sentirse como en casa. En Residencial Monarca cuidamos cada detalle para ofrecer un entorno cálido, confortable y seguro, pensado para acompañar las necesidades de nuestros residentes y favorecer su bienestar cotidiano.</p>
+                <ul class="service-list">
+                    <li><strong>Habitaciones confortables:</strong> Equipadas y calefaccionadas, preparadas para brindar comodidad, descanso y tranquilidad en un ambiente acogedor.</li>
+                    <li><strong>Accesibilidad:</strong> Contamos con espacios pensados para facilitar la movilidad, el desplazamiento y la autonomía de nuestros residentes.</li>
+                    <li><strong>Baños adaptados:</strong> Adaptados para brindar mayor seguridad, comodidad y facilidad de uso, contemplando las necesidades de cada persona.</li>
+                    <li><strong>Seguridad y tranquilidad:</strong> Disponemos de sistema de videovigilancia, como parte de las medidas destinadas a favorecer un entorno cuidado y seguro.</li>
+                    <li><strong>Conectividad:</strong> Contamos con Wi-Fi, facilitando la comunicación y el contacto con familiares y seres queridos.</li>
+                    <li><strong>Áreas comunes:</strong> Contamos con espacios amplios, confortables y luminosos, pensados para compartir, conversar, realizar actividades y disfrutar momentos de encuentro. Además, disponemos de áreas exteriores adaptadas y cuidadas, ideales para disfrutar al aire libre.</li>
+                </ul>
+            </div>
+            
+            <!-- Alimentación -->
+            <div class="service-block">
+                <h3><i class="fas fa-utensils"></i> Alimentación</h3>
+                <p>En Residencial Monarca ofrecemos una alimentación variada y equilibrada, contemplando las necesidades de cada residente.</p>
+                <p>Contamos con desayuno, almuerzo, merienda, cena y colaciones, además de dietas especiales de acuerdo con las necesidades y requerimientos de cada persona. Buscamos que cada comida sea también un momento agradable para compartir, disfrutar y sentirse como en casa.</p>
+            </div>
+
+            <!-- Talleres y Actividades -->
+            <div class="service-block">
+                <h3><i class="fas fa-puzzle-piece"></i> Talleres y Actividades</h3>
+                <p>En Residencial Monarca promovemos espacios de encuentro, movimiento y creatividad, adaptados a las posibilidades e intereses de cada residente. Contamos con propuestas que buscan favorecer el bienestar, la autonomía, la participación y la interacción social, haciendo de cada día una oportunidad para compartir y disfrutar.</p>
+                <ul class="service-list">
+                    <li><strong>Talleres recreativos:</strong> Actividades pensadas para estimular la participación, el entretenimiento y el vínculo con los demás.</li>
+                    <li><strong>Gimnasia funcional:</strong> Ejercicios adaptados que favorecen el movimiento, la movilidad y el mantenimiento de las capacidades físicas.</li>
+                    <li><strong>Manualidades y expresión:</strong> Espacios para desarrollar la creatividad, expresarse y disfrutar de actividades que estimulan las habilidades y la imaginación.</li>
+                    <li><strong>Momentos de encuentro:</strong> Propuestas para compartir, conversar y fortalecer los vínculos en un ambiente cálido y agradable.</li>
+                </ul>
+            </div>
+
+            <!-- Equipo y Enfermería -->
+            <div class="service-block">
+                <h3><i class="fas fa-user-nurse"></i> Equipo y Enfermería</h3>
+                <p>En Residencial Monarca contamos con un equipo de profesionales de la salud comprometido con el cuidado y bienestar de cada residente.</p>
+                <p>Nuestro trabajo incluye:</p>
+                <ul class="service-list">
+                    <li>Control de stock y administración de la medicación, de acuerdo con las indicaciones correspondientes.</li>
+                    <li>Seguimiento diario del estado y las necesidades de cada residente.</li>
+                    <li>Coordinación con profesionales de la salud y referentes familiares cuando corresponde.</li>
+                    <li>Aplicación de protocolos y pautas de cuidado, orientados a brindar una atención segura y responsable.</li>
+                    <li>Registro y seguimiento de la información relevante, favoreciendo la continuidad del cuidado.</li>
+                </ul>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Galería de Instalaciones Fijas -->
+    <section id="instalaciones" class="gallery-container" style="background-color: var(--white);">
         <h2 class="section-title">Nuestras Instalaciones</h2>
         
         <div class="gallery-filters">
@@ -144,15 +196,14 @@
         </div>
     </section>
 
-    <!-- NUEVA SECCIÓN: Galería de Actividades -->
-    <section id="galeria" class="gallery-container" style="background-color: var(--white);">
+    <!-- Galería de Actividades Dinámica -->
+    <section id="galeria" class="gallery-container" style="background-color: var(--bg-light);">
         <h2 class="section-title">Galería</h2>
         
         <div class="gallery-filters">
             <p style="text-align: center; color: var(--text-muted); width: 100%;">Momentos y actividades en Residencial Monarca</p>
         </div>
 
-        <!-- Contenedor vacío donde JS inyectará las fotos -->
         <div class="gallery-grid" id="galeria-dinamica">
         </div>
     </section>
@@ -181,17 +232,14 @@
         </div>
     </section>
 
-    <!-- WhatsApp Flotante -->
     <a href="https://whatsapp.com" class="whatsapp-float" target="_blank">
         <i class="fab fa-whatsapp"></i>
     </a>
 
-    <!-- Footer -->
     <footer>
         <p>&copy; 2026 Residencial Monarca. Todos los derechos reservados.</p>
     </footer>
 
-    <!-- Enlace al archivo JavaScript externo -->
     <script src="js/main.js"></script>
 </body>
 </html>
