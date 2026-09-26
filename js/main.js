@@ -70,7 +70,24 @@ document.addEventListener('DOMContentLoaded', () => {
         inicializarLightbox();
     }
 
-    // 4. Lógica del Lightbox
+    // 4. Lógica para expandir / colapsar el perfil del director
+    const toggleBtn = document.getElementById('toggle-director-btn');
+    const textContainer = document.getElementById('director-text-container');
+
+    if (toggleBtn && textContainer) {
+        toggleBtn.addEventListener('click', () => {
+            textContainer.classList.toggle('expanded');
+            
+            if (textContainer.classList.contains('expanded')) {
+                toggleBtn.textContent = 'Ver menos';
+            } else {
+                toggleBtn.textContent = 'Ver más';
+                textContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        });
+    }
+
+    // 5. Lógica del Lightbox
     function inicializarLightbox() {
         const lightbox = document.getElementById('lightbox');
         const lightboxImg = document.getElementById('lightbox-img');

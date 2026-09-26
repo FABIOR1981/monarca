@@ -152,20 +152,126 @@ section {
    ========================================= */
 .about-grid {
     display: grid;
-    grid-template-columns: 1fr 1.2fr;
+    grid-template-columns: 1fr 1fr;
     gap: 2.5rem;
-    align-items: start;
+    align-items: stretch; /* Mantiene la misma altura en ambas tarjetas */
 }
 
-/* Tarjeta combinada de Misión y Visión */
-.combined-mv {
+/* Tarjeta del Director y Misión/Visión con distribución simétrica */
+.card-director, .combined-mv {
     background: var(--white);
     padding: 2.5rem;
     border-radius: 16px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.04);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.card-director {
+    border-top: 4px solid var(--accent);
+}
+
+.combined-mv {
     border-top: 4px solid var(--primary);
 }
 
+.director-header {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid var(--bg-light);
+    padding-bottom: 1.5rem;
+}
+
+/* Foto del director en formato vertical con enfoque en la parte superior */
+.director-img {
+    width: 90px !important;
+    height: 110px !important;
+    min-width: 90px !important;
+    min-height: 110px !important;
+    border-radius: 12px !important;
+    object-fit: cover !important;
+    object-position: top center !important;
+    border: 3px solid var(--accent);
+    flex-shrink: 0;
+}
+
+.director-header h3 {
+    color: var(--primary);
+    font-size: 1.4rem;
+    margin-bottom: 0.2rem;
+}
+
+.director-subtitle {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+/* Contenedor colapsable del texto del director */
+.director-text-container {
+    max-height: 250px;
+    overflow: hidden;
+    position: relative;
+    transition: max-height 0.5s ease-in-out;
+}
+
+.director-text-container::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 50px;
+    background: linear-gradient(transparent, var(--white));
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.director-text-container.expanded {
+    max-height: 2000px;
+}
+
+.director-text-container.expanded::after {
+    opacity: 0;
+}
+
+.director-text p {
+    text-align: justify;
+    color: var(--text-main);
+    font-size: 0.95rem;
+    line-height: 1.7;
+    margin-bottom: 1rem;
+}
+
+.director-btn-container {
+    margin-top: 1.5rem;
+    text-align: center;
+    border-top: 1px solid var(--bg-light);
+    padding-top: 1rem;
+}
+
+.btn-leer-mas {
+    background: transparent;
+    border: 2px solid var(--accent);
+    color: var(--primary-dark);
+    padding: 0.5rem 1.5rem;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: var(--transition);
+}
+
+.btn-leer-mas:hover {
+    background: var(--accent);
+    color: var(--white);
+    transform: translateY(-2px);
+}
+
+/* Misión y Visión bloques internos */
 .mv-block h3 {
     color: var(--primary);
     margin-bottom: 1rem;
@@ -185,57 +291,6 @@ section {
     height: 1px;
     background-color: var(--bg-light);
     margin: 2rem 0;
-}
-
-/* Tarjeta del Director */
-.card-director {
-    background: var(--white);
-    padding: 2.5rem;
-    border-radius: 16px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.04);
-    border-top: 4px solid var(--accent);
-}
-
-.director-header {
-    display: flex;
-    align-items: center;
-    gap: 1.5rem;
-    margin-bottom: 1.5rem;
-    border-bottom: 2px solid var(--bg-light);
-    padding-bottom: 1.5rem;
-}
-
-/* Control y diseño adaptable para la foto del director */
-.director-img {
-    width: 100px !important;
-    height: 120px !important;
-    min-width: 100px !important;
-    min-height: 120px !important;
-    border-radius: 12px !important; /* Bordes redondeados suaves en vez de círculo */
-    object-fit: cover !important;
-    object-position: top center !important; /* Asegura que la cara y la cabeza queden siempre visibles */
-    border: 3px solid var(--accent);
-    flex-shrink: 0;
-}
-
-.director-header h3 {
-    color: var(--primary);
-    font-size: 1.4rem;
-    margin-bottom: 0.2rem;
-}
-
-.director-subtitle {
-    color: var(--text-muted);
-    font-size: 0.95rem;
-    font-weight: 500;
-}
-
-.director-text p {
-    text-align: justify;
-    color: var(--text-main);
-    font-size: 0.95rem;
-    line-height: 1.7;
-    margin-bottom: 1rem;
 }
 
 /* Valores */
