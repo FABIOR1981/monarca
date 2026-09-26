@@ -31,39 +31,46 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // 3. Cargar Galería Dinámica
+    // 3. Cargar Galería Dinámica desde Cloudinary
     const galeriaDinamica = document.getElementById('galeria-dinamica');
+    const cloudName = 'p0qlmlor';       // Tu Cloud Name
+    const tag = 'monarca_galeria';      // Etiqueta asignada a las fotos en Cloudinary
     
     if (galeriaDinamica) {
-        fetch('galeria.json')
+        fetch(`https://res.cloudinary.com/${cloudName}/image/list/${tag}.json`)
             .then(response => {
-                if (!response.ok) throw new Error("No se encontró galeria.json");
+                if (!response.ok) throw new Error("No se pudo obtener la lista de Cloudinary. Verifica el Tag o la opción 'Resource list' en Security.");
                 return response.json();
             })
-            .then(imagenes => {
+            .then(data => {
+                const imagenes = data.resources || [];
+
                 if (imagenes.length === 0) {
                     galeriaDinamica.innerHTML = '<p style="grid-column: 1 / -1; text-align: center; color: #666;">Próximamente compartiremos más momentos.</p>';
                     return;
                 }
 
-                // Generar HTML por cada imagen
-                const htmlImagenes = imagenes.map(img => `
-                    <div class="gallery-item">
-                        <img src="img/galeria/${img}" alt="Actividad en Monarca" loading="lazy">
-                        <div class="gallery-overlay">
-                           
+                // Generar HTML por cada imagen aprovechando la optimización automática (q_auto, f_auto)
+                const htmlImagenes = imagenes.map(img => {
+                    const urlImagen = `https://res.cloudinary.com/${cloudName}/image/upload/q_auto,f_auto/v${img.version}/${img.public_id}.${img.format}`;
+                    
+                    return `
+                        <div class="gallery-item">
+                            <img src="${urlImagen}" alt="Actividad en Monarca" loading="lazy">
+                            <div class="gallery-overlay"></div>
                         </div>
-                    </div>
-                `).join('');
+                    `;
+                }).join('');
                 
                 galeriaDinamica.innerHTML = htmlImagenes;
 
-                // Inicializar Lightbox después de cargar las fotos
+                // Inicializar Lightbox después de renderizar las fotos de Cloudinary
                 inicializarLightbox();
             })
             .catch(error => {
-                console.error('Error cargando la galería dinámica:', error);
-                inicializarLightbox(); // Inicializar para las fotos fijas al menos
+                console.error('Error cargando la galería desde Cloudinary:', error);
+                galeriaDinamica.innerHTML = '<p style="grid-column: 1 / -1; text-align: center; color: #666;">Próximamente compartiremos más momentos.</p>';
+                inicializarLightbox(); // Inicializa para las fotos fijas si la API falla
             });
     } else {
         inicializarLightbox();
