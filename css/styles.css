@@ -77,7 +77,6 @@ nav a:hover {
 /* Hero Section */
 .hero {
     height: 100vh;
-    /* Aquí actualizamos la ruta a ../img/instalaciones/fachada.jpeg */
     background: linear-gradient(rgba(44, 53, 45, 0.5), rgba(44, 53, 45, 0.6)), url('../img/instalaciones/fachada.jpeg') center/cover no-repeat;
     display: flex;
     align-items: center;
@@ -187,7 +186,7 @@ section {
 }
 
 .value-item {
-    background: var(--bg-light); /* Un fondo sutil para contrastar con la sección blanca */
+    background: var(--bg-light);
     padding: 2rem;
     border-radius: 10px;
     box-shadow: 0 4px 10px rgba(0,0,0,0.02);
@@ -208,6 +207,96 @@ section {
     font-size: 1.2rem;
     margin-bottom: 0.5rem;
     color: var(--primary-dark);
+}
+
+/* =========================================
+   SECCIÓN SERVICIOS (Diseño Mejorado)
+   ========================================= */
+.services-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 2.5rem;
+    padding: 0 5%;
+}
+
+.service-block {
+    background: var(--white);
+    padding: 3rem 2.5rem;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.04);
+    border: 1px solid rgba(74, 93, 78, 0.08);
+    transition: var(--transition);
+    display: flex;
+    flex-direction: column;
+}
+
+.service-block:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.08);
+}
+
+.service-block h3 {
+    color: var(--primary);
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    border-bottom: 2px solid var(--bg-light);
+    padding-bottom: 1.5rem;
+}
+
+.service-block h3 i {
+    background: var(--bg-light);
+    color: var(--accent);
+    width: 55px;
+    height: 55px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.service-block p {
+    margin-bottom: 1.5rem;
+    text-align: justify;
+    color: var(--text-main);
+    line-height: 1.7;
+}
+
+.service-list {
+    list-style: none;
+    padding: 0;
+    margin-top: auto;
+}
+
+.service-list li {
+    margin-bottom: 1.5rem;
+    position: relative;
+    padding-left: 2.5rem;
+    text-align: justify;
+    color: var(--text-muted);
+    line-height: 1.6;
+}
+
+.service-list li::before {
+    content: '\f105';
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    position: absolute;
+    left: 0;
+    top: 2px;
+    color: var(--accent);
+    font-size: 1.2rem;
+}
+
+.service-list li strong {
+    color: var(--primary-dark);
+    display: block;
+    margin-bottom: 0.3rem;
+    font-size: 1.05rem;
 }
 
 /* Galería de Fotos (HTML + CSS + JS) */
@@ -400,5 +489,13 @@ footer {
     }
     .hero-content h1 {
         font-size: 2.8rem;
+    }
+    /* Ajustes responsivos para Servicios */
+    .services-container {
+        grid-template-columns: 1fr;
+        padding: 0;
+    }
+    .service-block {
+        padding: 2rem 1.5rem;
     }
 }
