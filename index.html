@@ -55,8 +55,8 @@
                         </div>
                     </div>
 
-                    <div class="director-text-container" id="director-text-container">
-                        <div class="director-text">
+                    <div class="expandable-container" id="director-text-container">
+                        <div class="expandable-content">
                             <h4 style="color: var(--primary); margin-bottom: 0.8rem; font-family: 'Playfair Display', serif;">Mi compromiso con Monarca</h4>
                             <p>Soy Licenciado en Enfermería y cuento con más de 20 años de experiencia en el ámbito de la salud, con una trayectoria especialmente vinculada a la salud mental y al cuidado de las personas.</p>
                             
@@ -77,8 +77,8 @@
                     </div>
                 </div>
 
-                <div class="director-btn-container">
-                    <button id="toggle-director-btn" class="btn-leer-mas">Ver más</button>
+                <div class="expandable-btn-container">
+                    <button class="btn-leer-mas" data-target="director-text-container">Ver más</button>
                 </div>
             </div>
 
@@ -144,53 +144,89 @@
         <h2 class="section-title">Nuestros Servicios</h2>
         <div class="services-container">
             
-            <!-- Instalaciones y Comodidades -->
+            <!-- Instalaciones y Comodidades (Expandible) -->
             <div class="service-block">
-                <h3><i class="fas fa-home"></i> Instalaciones</h3>
-                <p>Un espacio pensado para sentirse como en casa. En Residencial Monarca cuidamos cada detalle para ofrecer un entorno cálido, confortable y seguro, pensado para acompañar las necesidades de nuestros residentes y favorecer su bienestar cotidiano.</p>
-                <ul class="service-list">
-                    <li><strong>Habitaciones confortables:</strong> Habitaciones equipadas y calefaccionadas, preparadas para brindar comodidad, descanso y tranquilidad en un ambiente acogedor.</li>
-                    <li><strong>Accesibilidad:</strong> Contamos con espacios pensados para facilitar la movilidad, el desplazamiento y la autonomía de nuestros residentes.</li>
-                    <li><strong>Baños adaptados:</strong> Baños adaptados para brindar mayor seguridad, comodidad y facilidad de uso, contemplando las necesidades de cada persona.</li>
-                    <li><strong>Seguridad y tranquilidad:</strong> Disponemos de sistema de videovigilancia, como parte de las medidas destinadas a favorecer un entorno cuidado y seguro.</li>
-                    <li><strong>Conectividad:</strong> Contamos con Wi-Fi, facilitando la comunicación y el contacto con familiares y seres queridos.</li>
-                    <li><strong>Áreas comunes:</strong> Contamos con espacios amplios, confortables y luminosos, pensados para compartir, conversar, realizar actividades y disfrutar momentos de encuentro. Además, disponemos de áreas exteriores adaptadas y cuidadas, ideales para disfrutar al aire libre, compartir con familiares y crear momentos especiales en un entorno agradable y tranquilo.</li>
-                </ul>
+                <div>
+                    <h3><i class="fas fa-home"></i> Instalaciones</h3>
+                    <p>Un espacio pensado para sentirse como en casa. En Residencial Monarca cuidamos cada detalle para ofrecer un entorno cálido, confortable y seguro.</p>
+                    
+                    <div class="expandable-container" id="service-instalaciones">
+                        <div class="expandable-content">
+                            <ul class="service-list" style="margin-top: 1rem;">
+                                <li><strong>Habitaciones confortables:</strong> Habitaciones equipadas y calefaccionadas, preparadas para brindar comodidad, descanso y tranquilidad en un ambiente acogedor.</li>
+                                <li><strong>Accesibilidad:</strong> Contamos con espacios pensados para facilitar la movilidad, el desplazamiento y la autonomía de nuestros residentes.</li>
+                                <li><strong>Baños adaptados:</strong> Baños adaptados para brindar mayor seguridad, comodidad y facilidad de uso, contemplando las necesidades de cada persona.</li>
+                                <li><strong>Seguridad y tranquilidad:</strong> Disponemos de sistema de videovigilancia, como parte de las medidas destinadas a favorecer un entorno cuidado y seguro.</li>
+                                <li><strong>Conectividad:</strong> Contamos con Wi-Fi, facilitando la comunicación y el contacto con familiares y seres queridos.</li>
+                                <li><strong>Áreas comunes:</strong> Contamos con espacios amplios, confortables y luminosos, pensados para compartir, conversar, realizar actividades y disfrutar momentos de encuentro. Además, disponemos de áreas exteriores adaptadas y cuidadas, ideales para disfrutar al aire libre, compartir con familiares y crear momentos especiales en un entorno agradable y tranquilo.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="expandable-btn-container">
+                    <button class="btn-leer-mas" data-target="service-instalaciones">Ver más</button>
+                </div>
             </div>
             
-            <!-- Alimentación -->
-            <div class="service-block">
-                <h3><i class="fas fa-utensils"></i> Alimentación</h3>
-                <p>En Residencial Monarca ofrecemos una alimentación variada y equilibrada, contemplando las necesidades de cada residente.</p>
-                <ul class="service-list">
-                    <li><strong>Servicio completo:</strong> Contamos con desayuno, almuerzo, merienda, cena y colaciones, además de dietas especiales de acuerdo con las necesidades y requerimientos de cada persona.</li>
-                    <li><strong>Sentido de hogar:</strong> Buscamos que cada comida sea también un momento agradable para compartir, disfrutar y sentirse como en casa.</li>
-                </ul>
+            <!-- Alimentación (Altura base, sin botón porque no lo necesita) -->
+            <div class="service-block service-fixed-height">
+                <div>
+                    <h3><i class="fas fa-utensils"></i> Alimentación</h3>
+                    <p>En Residencial Monarca ofrecemos una alimentación variada y equilibrada, contemplando las necesidades de cada residente.</p>
+                    <ul class="service-list">
+                        <li><strong>Servicio completo:</strong> Contamos con desayuno, almuerzo, merienda, cena y colaciones, además de dietas especiales de acuerdo con las necesidades y requerimientos de cada persona.</li>
+                        <li><strong>Sentido de hogar:</strong> Buscamos que cada comida sea también un momento agradable para compartir, disfrutar y sentirse como en casa.</li>
+                    </ul>
+                </div>
             </div>
 
-            <!-- Talleres y Actividades -->
+            <!-- Talleres y Actividades (Expandible) -->
             <div class="service-block">
-                <h3><i class="fas fa-puzzle-piece"></i> Talleres y Actividades</h3>
-                <p>En Residencial Monarca promovemos espacios de encuentro, movimiento y creatividad, adaptados a las posibilidades e intereses de cada residente. Contamos con propuestas que buscan favorecer el bienestar, la autonomía, la participación y la interacción social, haciendo de cada día una oportunidad para compartir y disfrutar.</p>
-                <ul class="service-list">
-                    <li><strong>Talleres recreativos:</strong> Actividades pensadas para estimular la participación, el entretenimiento y el vínculo con los demás.</li>
-                    <li><strong>Gimnasia funcional:</strong> Ejercicios adaptados que favorecen el movimiento, la movilidad y el mantenimiento de las capacidades físicas.</li>
-                    <li><strong>Manualidades y expresión:</strong> Espacios para desarrollar la creatividad, expresarse y disfrutar de actividades que estimulan las habilidades y la imaginación.</li>
-                    <li><strong>Momentos de encuentro:</strong> Propuestas para compartir, conversar y fortalecer los vínculos en un ambiente cálido y agradable.</li>
-                </ul>
+                <div>
+                    <h3><i class="fas fa-puzzle-piece"></i> Talleres y Actividades</h3>
+                    <p>En Residencial Monarca promovemos espacios de encuentro, movimiento y creatividad, adaptados a las posibilidades e intereses de cada residente.</p>
+                    
+                    <div class="expandable-container" id="service-talleres">
+                        <div class="expandable-content">
+                            <ul class="service-list" style="margin-top: 1rem;">
+                                <li><strong>Talleres recreativos:</strong> Actividades pensadas para estimular la participación, el entretenimiento y el vínculo con los demás.</li>
+                                <li><strong>Gimnasia funcional:</strong> Ejercicios adaptados que favorecen el movimiento, la movilidad y el mantenimiento de las capacidades físicas.</li>
+                                <li><strong>Manualidades y expresión:</strong> Espacios para desarrollar la creatividad, expresarse y disfrutar de actividades que estimulan las habilidades y la imaginación.</li>
+                                <li><strong>Momentos de encuentro:</strong> Propuestas para compartir, conversar y fortalecer los vínculos en un ambiente cálido y agradable.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="expandable-btn-container">
+                    <button class="btn-leer-mas" data-target="service-talleres">Ver más</button>
+                </div>
             </div>
 
-            <!-- Equipo y Enfermería -->
+            <!-- Equipo y Enfermería (Expandible) -->
             <div class="service-block">
-                <h3><i class="fas fa-user-nurse"></i> Equipo, Enfermería</h3>
-                <p>En Residencial Monarca contamos con un equipo de profesionales de la salud comprometido con el cuidado y bienestar de cada residente. Nuestro trabajo incluye:</p>
-                <ul class="service-list">
-                    <li><strong>Administración:</strong> Control de stock y administración de la medicación, de acuerdo con las indicaciones correspondientes.</li>
-                    <li><strong>Control continuo:</strong> Seguimiento diario del estado y las necesidades de cada residente.</li>
-                    <li><strong>Comunicación:</strong> Coordinación con profesionales de la salud y referentes familiares cuando corresponde.</li>
-                    <li><strong>Atención segura:</strong> Aplicación de protocolos y pautas de cuidado, orientados a brindar una atención segura y responsable.</li>
-                    <li><strong>Continuidad del cuidado:</strong> Registro y seguimiento de la información relevante, favoreciendo la continuidad del cuidado.</li>
-                </ul>
+                <div>
+                    <h3><i class="fas fa-user-nurse"></i> Equipo, Enfermería</h3>
+                    <p>En Residencial Monarca contamos con un equipo de profesionales de la salud comprometido con el cuidado y bienestar de cada residente.</p>
+                    
+                    <div class="expandable-container" id="service-enfermeria">
+                        <div class="expandable-content">
+                            <p style="margin-bottom: 1rem;">Nuestro trabajo incluye:</p>
+                            <ul class="service-list">
+                                <li><strong>Administración:</strong> Control de stock y administración de la medicación, de acuerdo con las indicaciones correspondientes.</li>
+                                <li><strong>Control continuo:</strong> Seguimiento diario del estado y las necesidades de cada residente.</li>
+                                <li><strong>Comunicación:</strong> Coordinación con profesionales de la salud y referentes familiares cuando corresponde.</li>
+                                <li><strong>Atención segura:</strong> Aplicación de protocolos y pautas de cuidado, orientados a brindar una atención segura y responsable.</li>
+                                <li><strong>Continuidad del cuidado:</strong> Registro y seguimiento de la información relevante, favoreciendo la continuidad del cuidado.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="expandable-btn-container">
+                    <button class="btn-leer-mas" data-target="service-enfermeria">Ver más</button>
+                </div>
             </div>
 
         </div>

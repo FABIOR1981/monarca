@@ -154,10 +154,9 @@ section {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 2.5rem;
-    align-items: stretch; /* Mantiene la misma altura en ambas tarjetas */
+    align-items: stretch;
 }
 
-/* Tarjeta del Director y Misión/Visión con distribución simétrica */
 .card-director, .combined-mv {
     background: var(--white);
     padding: 2.5rem;
@@ -185,7 +184,6 @@ section {
     padding-bottom: 1.5rem;
 }
 
-/* Foto del director en formato vertical con enfoque en la parte superior */
 .director-img {
     width: 90px !important;
     height: 110px !important;
@@ -210,15 +208,15 @@ section {
     font-weight: 500;
 }
 
-/* Contenedor colapsable del texto del director */
-.director-text-container {
-    max-height: 250px;
+/* Clases generales para contenedores expandibles (Director y Servicios) */
+.expandable-container {
+    max-height: 180px; /* Altura uniforme para que todas midan igual que Alimentación inicialmente */
     overflow: hidden;
     position: relative;
     transition: max-height 0.5s ease-in-out;
 }
 
-.director-text-container::after {
+.expandable-container::after {
     content: '';
     position: absolute;
     bottom: 0;
@@ -230,11 +228,11 @@ section {
     transition: opacity 0.3s ease;
 }
 
-.director-text-container.expanded {
+.expandable-container.expanded {
     max-height: 2000px;
 }
 
-.director-text-container.expanded::after {
+.expandable-container.expanded::after {
     opacity: 0;
 }
 
@@ -246,7 +244,7 @@ section {
     margin-bottom: 1rem;
 }
 
-.director-btn-container {
+.expandable-btn-container {
     margin-top: 1.5rem;
     text-align: center;
     border-top: 1px solid var(--bg-light);
@@ -271,7 +269,6 @@ section {
     transform: translateY(-2px);
 }
 
-/* Misión y Visión bloques internos */
 .mv-block h3 {
     color: var(--primary);
     margin-bottom: 1rem;
@@ -336,6 +333,7 @@ section {
     grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
     gap: 2.5rem;
     padding: 0 5%;
+    align-items: stretch;
 }
 
 .service-block {
@@ -347,7 +345,7 @@ section {
     transition: var(--transition);
     display: flex;
     flex-direction: column;
-    justify-content: flex-start;
+    justify-content: space-between;
 }
 
 .service-block:hover {
@@ -389,8 +387,6 @@ section {
 .service-list {
     list-style: none;
     padding: 0;
-    margin-top: 0.5rem;
-    margin-bottom: 0;
 }
 
 .service-list li {

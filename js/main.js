@@ -70,22 +70,26 @@ document.addEventListener('DOMContentLoaded', () => {
         inicializarLightbox();
     }
 
-    // 4. Lógica para expandir / colapsar el perfil del director
-    const toggleBtn = document.getElementById('toggle-director-btn');
-    const textContainer = document.getElementById('director-text-container');
+    // 4. Lógica general para botones expandibles ("Ver más" / "Ver menos")
+    const expandableButtons = document.querySelectorAll('.btn-leer-mas');
 
-    if (toggleBtn && textContainer) {
-        toggleBtn.addEventListener('click', () => {
-            textContainer.classList.toggle('expanded');
-            
-            if (textContainer.classList.contains('expanded')) {
-                toggleBtn.textContent = 'Ver menos';
-            } else {
-                toggleBtn.textContent = 'Ver más';
-                textContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    expandableButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const targetId = button.getAttribute('data-target');
+            const container = document.getElementById(targetId);
+
+            if (container) {
+                container.classList.toggle('expanded');
+
+                if (container.classList.contains('expanded')) {
+                    button.textContent = 'Ver menos';
+                } else {
+                    button.textContent = 'Ver más';
+                    container.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }
             }
         });
-    }
+    });
 
     // 5. Lógica del Lightbox
     function inicializarLightbox() {
