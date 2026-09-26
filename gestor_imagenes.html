@@ -14,7 +14,7 @@
         <header class="mb-8 border-b border-slate-800 pb-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
                 <h1 class="text-3xl font-bold tracking-tight text-amber-400">Gestor de Imágenes</h1>
-                <p class="text-slate-400 text-sm mt-1">Optimizador y renombrador automático (YYYYMMDDHHMMSS)</p>
+                <p class="text-slate-400 text-sm mt-1">Optimizador y renombrador automático</p>
             </div>
             <div class="flex flex-wrap items-center gap-4 bg-slate-800 p-3 rounded-lg border border-slate-700">
                 <div class="flex items-center gap-2">
@@ -88,8 +88,8 @@
                             imgElement: img,
                             timestamp: fileDate.getTime(),
                             keepOriginal: keepOrig,
-                            originalNameSanitized: sanitizeName(rawName),
-                            customName: keepOrig ? sanitizeName(rawName) : 'imagen',
+                            originalName: rawName,
+                            customName: 'imagen',
                             category: globalCategory.value,
                             customLegend: globalCategory.value === 'instalaciones' ? 'Instalaciones' : 'Galería',
                             dateStr: getFormattedDate(fileDate)
@@ -122,18 +122,9 @@
             const val = globalKeepOriginal.checked;
             imageFiles.forEach(item => {
                 item.keepOriginal = val;
-                item.customName = val ? item.originalNameSanitized : 'imagen';
             });
             renderCards();
         });
-
-        function sanitizeName(name) {
-            return name.toLowerCase()
-                .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-                .replace(/[^a-z0-9]/g, '_')
-                .replace(/_+/g, '_')
-                .substring(0, 20);
-        }
 
         function getFormattedDate(dateObj) {
             const yyyy = dateObj.getFullYear();
@@ -162,7 +153,10 @@
                 const card = document.createElement('div');
                 card.className = "bg-slate-800 rounded-xl border border-slate-700 p-4 flex flex-col gap-3 shadow-md";
                 
-                const finalGeneratedName = `${item.dateStr}_${item.customName || 'imagen'}.webp`;
+                // Si keepOriginal está activo, usa el nombre original exacto. Si no, usa YYYYMMDDHHMMSS + customName
+                const finalGeneratedName = item.keepOriginal 
+                    ? `${item.originalName}.webp` 
+                    : `${item.dateStr}_${item.customName || 'imagen'}.webp`;
 
                 card.innerHTML = `
                     <div class="relative rounded-lg overflow-hidden bg-slate-950 aspect-video flex items-center justify-center border border-slate-700">
@@ -170,13 +164,20 @@
                     </div>
                     <div class="flex flex-col gap-2 text-sm">
                         <div class="flex justify-between items-center">
-                            <label class="text-xs text-slate-400">Nombre archivo:</label>
+                            <label class="text-xs text-slate-400">Modo de nombre:</label>
                             <div class="flex items-center gap-1.5">
                                 <input type="checkbox" data-index="${index}" class="card-keep-original w-3.5 h-3.5 accent-amber-500 cursor-pointer" ${item.keepOriginal ? 'checked' : ''}>
-                                <span class="text-[11px] text-slate-400 cursor-pointer">Usar original</span>
+                                <span class="text-[11px] text-slate-400 cursor-pointer">Respetar original</span>
                             </div>
                         </div>
-                        <input type="text" value="${item.customName}" data-index="${index}" class="custom-name-input w-full bg-slate-900 border border-slate-600 rounded px-2 py-1 text-slate-200 text-xs focus:outline-none focus:border-amber-500">
+                        
+                        ${item.keepOriginal ? `
+                            <div class="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1.5 text-slate-400 text-xs truncate">
+                                ${item.originalName} (Original sin modificar)
+                            </div>
+                        ` : `
+                            <input type="text" value="${item.customName}" data-index="${index}" placeholder="Nombre corto..." class="custom-name-input w-full bg-slate-900 border border-slate-600 rounded px-2 py-1 text-slate-200 text-xs focus:outline-none focus:border-amber-500">
+                        `}
                         
                         <div class="grid grid-cols-2 gap-2 mt-1">
                             <div>
@@ -247,19 +248,14 @@
             document.querySelectorAll('.custom-name-input').forEach(input => {
                 input.addEventListener('input', (e) => {
                     const idx = e.target.dataset.index;
-                    imageFiles[idx].customName = sanitizeName(e.target.value);
-                    renderCardsNoLossFocus(idx, e.target);
+                    imageFiles[idx].customName = e.target.value;
                 });
             });
 
             document.querySelectorAll('.card-keep-original').forEach(chk => {
                 chk.addEventListener('change', (e) => {
                     const idx = e.target.dataset.index;
-                    const checked = e.target.checked;
-                    imageFiles[idx].keepOriginal = checked;
-                    if (checked) {
-                        imageFiles[idx].customName = imageFiles[idx].originalNameSanitized;
-                    }
+                    imageFiles[idx].keepOriginal = e.target.checked;
                     renderCards();
                 });
             });
@@ -307,16 +303,6 @@
             };
         }
 
-        function renderCardsNoLossFocus(activeIdx, targetElement) {
-            const cursorPosition = targetElement.selectionStart;
-            renderCards();
-            const newInputs = document.querySelectorAll('.custom-name-input');
-            if (newInputs[activeIdx]) {
-                newInputs[activeIdx].focus();
-                newInputs[activeIdx].setSelectionRange(cursorPosition, cursorPosition);
-            }
-        }
-
         function downloadItem(index) {
             const item = imageFiles[index];
             const canvas = document.createElement('canvas');
@@ -350,7 +336,7 @@
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = `${item.dateStr}_${item.customName || 'imagen'}.webp`;
+                a.download = item.keepOriginal ? `${item.originalName}.webp` : `${item.dateStr}_${item.customName || 'imagen'}.webp`;
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
