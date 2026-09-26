@@ -14,7 +14,7 @@
         <header class="mb-8 border-b border-slate-800 pb-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
                 <h1 class="text-3xl font-bold tracking-tight text-amber-400">Gestor de Imágenes</h1>
-                <p class="text-slate-400 text-sm mt-1">Optimizador y renombrador automático</p>
+                <p class="text-slate-400 text-sm mt-1">Optimizador con control de compresión y metadatos</p>
             </div>
             <div class="flex flex-wrap items-center gap-4 bg-slate-800 p-3 rounded-lg border border-slate-700">
                 <div class="flex items-center gap-2">
@@ -27,6 +27,10 @@
                 <div class="flex items-center gap-2 border-l border-slate-700 pl-3">
                     <input type="checkbox" id="globalKeepOriginal" checked class="w-4 h-4 accent-amber-500 cursor-pointer">
                     <label for="globalKeepOriginal" class="text-sm text-slate-300 cursor-pointer">Respetar nombre original</label>
+                </div>
+                <div class="flex items-center gap-2 border-l border-slate-700 pl-3">
+                    <label for="globalQuality" class="text-sm text-slate-300">Calidad (<span id="qualityVal">80</span>%):</label>
+                    <input type="range" id="globalQuality" min="40" max="100" value="80" class="accent-amber-500 cursor-pointer w-24">
                 </div>
             </div>
         </header>
@@ -60,11 +64,17 @@
         const cardsContainer = document.getElementById('cardsContainer');
         const globalCategory = document.getElementById('globalCategory');
         const globalKeepOriginal = document.getElementById('globalKeepOriginal');
+        const globalQuality = document.getElementById('globalQuality');
+        const qualityVal = document.getElementById('qualityVal');
         const batchActions = document.getElementById('batchActions');
         const counterText = document.getElementById('counterText');
         const downloadAllBtn = document.getElementById('downloadAllBtn');
 
         let imageFiles = [];
+
+        globalQuality.addEventListener('input', (e) => {
+            qualityVal.textContent = e.target.value;
+        });
 
         fileInput.addEventListener('change', (e) => {
             const files = Array.from(e.target.files);
@@ -86,13 +96,15 @@
                             id: randomStr.substring(2, 9),
                             fileObj: file,
                             imgElement: img,
+                            originalSize: file.size,
                             timestamp: fileDate.getTime(),
                             keepOriginal: keepOrig,
                             originalName: rawName,
                             customName: 'imagen',
                             category: globalCategory.value,
                             customLegend: globalCategory.value === 'instalaciones' ? 'Instalaciones' : 'Galería',
-                            dateStr: getFormattedDate(fileDate)
+                            dateStr: getFormattedDate(fileDate),
+                            quality: parseInt(globalQuality.value) / 100
                         };
                         imageFiles.push(imgData);
                         processedCount++;
@@ -126,6 +138,14 @@
             renderCards();
         });
 
+        globalQuality.addEventListener('change', () => {
+            const q = parseInt(globalQuality.value) / 100;
+            imageFiles.forEach(item => {
+                item.quality = q;
+            });
+            renderCards();
+        });
+
         function getFormattedDate(dateObj) {
             const yyyy = dateObj.getFullYear();
             const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
@@ -138,6 +158,14 @@
 
         function sortImages() {
             imageFiles.sort((a, b) => b.timestamp - a.timestamp);
+        }
+
+        function formatBytes(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024, dm = 2;
+            const sizes = ['Bytes', 'KB', 'MB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
         }
 
         function renderCards() {
@@ -153,7 +181,6 @@
                 const card = document.createElement('div');
                 card.className = "bg-slate-800 rounded-xl border border-slate-700 p-4 flex flex-col gap-3 shadow-md";
                 
-                // Si keepOriginal está activo, usa el nombre original exacto. Si no, usa YYYYMMDDHHMMSS + customName
                 const finalGeneratedName = item.keepOriginal 
                     ? `${item.originalName}.webp` 
                     : `${item.dateStr}_${item.customName || 'imagen'}.webp`;
@@ -163,17 +190,17 @@
                         <canvas id="canvas-${index}" class="preview-canvas object-contain w-full h-full"></canvas>
                     </div>
                     <div class="flex flex-col gap-2 text-sm">
-                        <div class="flex justify-between items-center">
-                            <label class="text-xs text-slate-400">Modo de nombre:</label>
+                        <div class="flex justify-between items-center text-xs text-slate-400">
+                            <span>Original: <strong class="text-slate-200">${formatBytes(item.originalSize)}</strong></span>
                             <div class="flex items-center gap-1.5">
                                 <input type="checkbox" data-index="${index}" class="card-keep-original w-3.5 h-3.5 accent-amber-500 cursor-pointer" ${item.keepOriginal ? 'checked' : ''}>
-                                <span class="text-[11px] text-slate-400 cursor-pointer">Respetar original</span>
+                                <span class="cursor-pointer">Respetar original</span>
                             </div>
                         </div>
                         
                         ${item.keepOriginal ? `
                             <div class="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1.5 text-slate-400 text-xs truncate">
-                                ${item.originalName} (Original sin modificar)
+                                ${item.originalName}
                             </div>
                         ` : `
                             <input type="text" value="${item.customName}" data-index="${index}" placeholder="Nombre corto..." class="custom-name-input w-full bg-slate-900 border border-slate-600 rounded px-2 py-1 text-slate-200 text-xs focus:outline-none focus:border-amber-500">
@@ -192,8 +219,9 @@
                                 <input type="text" value="${item.customLegend}" data-index="${index}" class="legend-input w-full bg-slate-900 border border-slate-600 rounded px-2 py-1 text-slate-200 text-xs focus:outline-none focus:border-amber-500">
                             </div>
                         </div>
-                        <div class="text-xs text-amber-400/90 truncate mt-1 bg-slate-900/60 p-1.5 rounded border border-slate-800">
-                            <span class="text-slate-500">Salida:</span> ${finalGeneratedName}
+                        <div class="text-xs text-amber-400/90 truncate mt-1 bg-slate-900/60 p-1.5 rounded border border-slate-800 flex justify-between items-center">
+                            <span class="truncate"><span class="text-slate-500">Salida:</span> ${finalGeneratedName}</span>
+                            <span id="size-badge-${index}" class="text-[10px] bg-slate-800 px-1.5 py-0.5 rounded text-slate-300 shrink-0">Calculando...</span>
                         </div>
                     </div>
                     <div class="flex justify-between items-center pt-2 border-t border-slate-700/60 mt-auto">
@@ -203,13 +231,13 @@
                 `;
 
                 cardsContainer.appendChild(card);
-                drawPreview(index);
+                drawPreviewAndMeasure(index);
             });
 
             attachEvents();
         }
 
-        function drawPreview(index) {
+        function drawPreviewAndMeasure(index) {
             const item = imageFiles[index];
             const canvas = document.getElementById(`canvas-${index}`);
             if (!canvas) return;
@@ -242,6 +270,17 @@
                 ctx.textBaseline = "middle";
                 ctx.fillText(item.customLegend, canvas.width / 2, y + (boxHeight / 2));
             }
+
+            canvas.toBlob((blob) => {
+                const badge = document.getElementById(`size-badge-${index}`);
+                if (badge) {
+                    const newSize = blob.size;
+                    const diff = newSize - item.originalSize;
+                    const diffPercent = Math.round((diff / item.originalSize) * 100);
+                    badge.textContent = `${formatBytes(newSize)} (${diffPercent > 0 ? '+' : ''}${diffPercent}%)`;
+                    badge.className = `text-[10px] px-1.5 py-0.5 rounded shrink-0 font-medium ${newSize < item.originalSize ? 'bg-emerald-950 text-emerald-400 border border-emerald-800' : 'bg-amber-950 text-amber-400 border border-amber-800'}`;
+                }
+            }, 'image/webp', item.quality);
         }
 
         function attachEvents() {
@@ -264,7 +303,7 @@
                 input.addEventListener('input', (e) => {
                     const idx = e.target.dataset.index;
                     imageFiles[idx].customLegend = e.target.value;
-                    drawPreview(idx);
+                    drawPreviewAndMeasure(idx);
                 });
             });
 
@@ -341,7 +380,7 @@
                 a.click();
                 document.body.removeChild(a);
                 URL.revokeObjectURL(url);
-            }, 'image/webp', 0.85);
+            }, 'image/webp', item.quality);
         }
     </script>
 </body>
