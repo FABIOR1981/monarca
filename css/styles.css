@@ -147,31 +147,94 @@ section {
     margin: 0.5rem auto 0 auto;
 }
 
-/* Misión y Visión */
-.mission-vision {
+/* =========================================
+   SECCIÓN SOBRE NOSOTROS (Misión/Visión + Director)
+   ========================================= */
+.about-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 2rem;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 2.5rem;
+    align-items: start;
 }
 
-.card-mv {
+/* Tarjeta combinada de Misión y Visión */
+.combined-mv {
     background: var(--white);
     padding: 2.5rem;
-    border-radius: 12px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.03);
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.04);
     border-top: 4px solid var(--primary);
-    transition: var(--transition);
-    text-align: justify;
 }
 
-.card-mv:hover {
-    transform: translateY(-5px);
-}
-
-.card-mv h3 {
+.mv-block h3 {
     color: var(--primary);
     margin-bottom: 1rem;
-    font-size: 1.5rem;
+    font-size: 1.4rem;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.mv-block p {
+    text-align: justify;
+    color: var(--text-main);
+    line-height: 1.7;
+}
+
+.mv-divider {
+    height: 1px;
+    background-color: var(--bg-light);
+    margin: 2rem 0;
+}
+
+/* Tarjeta del Director */
+.card-director {
+    background: var(--white);
+    padding: 2.5rem;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.04);
+    border-top: 4px solid var(--accent);
+}
+
+.director-header {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid var(--bg-light);
+    padding-bottom: 1.5rem;
+}
+
+/* Control estricto del tamaño de la foto del director */
+.director-img {
+    width: 90px !important;
+    height: 90px !important;
+    min-width: 90px !important;
+    min-height: 90px !important;
+    border-radius: 50% !important;
+    object-fit: cover !important;
+    border: 3px solid var(--accent);
+    flex-shrink: 0;
+}
+
+.director-header h3 {
+    color: var(--primary);
+    font-size: 1.4rem;
+    margin-bottom: 0.2rem;
+}
+
+.director-subtitle {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+.director-text p {
+    text-align: justify;
+    color: var(--text-main);
+    font-size: 0.95rem;
+    line-height: 1.7;
+    margin-bottom: 1rem;
 }
 
 /* Valores */
@@ -228,7 +291,7 @@ section {
     transition: var(--transition);
     display: flex;
     flex-direction: column;
-    justify-content: flex-start; /* Agrupa todo el texto arriba y deja el espacio al final */
+    justify-content: flex-start;
 }
 
 .service-block:hover {
@@ -301,7 +364,7 @@ section {
     font-size: 1.05rem;
 }
 
-/* Galería de Fotos (HTML + CSS + JS) */
+/* Galería de Fotos */
 .gallery-container {
     background-color: #EFECE6;
     padding: 5rem 10%;
@@ -373,7 +436,7 @@ section {
     opacity: 1;
 }
 
-/* Lightbox Modal para las fotos */
+/* Lightbox Modal */
 .lightbox {
     display: none;
     position: fixed;
@@ -470,6 +533,12 @@ footer {
 }
 
 /* Responsive */
+@media (max-width: 900px) {
+    .about-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
 @media (max-width: 768px) {
     nav ul {
         display: none;
