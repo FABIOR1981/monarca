@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestor de Imágenes - Proyecto Monarca</title>
+    <title>Gestor de Imágenes</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style>
         .preview-canvas { max-width: 100%; height: auto; }
@@ -13,8 +13,8 @@
     <div class="max-w-6xl mx-auto">
         <header class="mb-8 border-b border-slate-800 pb-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
-                <h1 class="text-3xl font-bold tracking-tight text-amber-400">ESPACIA / Monarca</h1>
-                <p class="text-slate-400 text-sm mt-1">Gestor y optimizador de imágenes (YYYYMMDDHHMMSS)</p>
+                <h1 class="text-3xl font-bold tracking-tight text-amber-400">Gestor de Imágenes</h1>
+                <p class="text-slate-400 text-sm mt-1">Optimizador y renombrador automático (YYYYMMDDHHMMSS)</p>
             </div>
             <div class="flex flex-wrap items-center gap-4 bg-slate-800 p-3 rounded-lg border border-slate-700">
                 <div class="flex items-center gap-2">
@@ -89,9 +89,9 @@
                             timestamp: fileDate.getTime(),
                             keepOriginal: keepOrig,
                             originalNameSanitized: sanitizeName(rawName),
-                            customName: keepOrig ? sanitizeName(rawName) : 'monarca',
+                            customName: keepOrig ? sanitizeName(rawName) : 'imagen',
                             category: globalCategory.value,
-                            customLegend: globalCategory.value === 'instalaciones' ? 'Instalaciones' : 'Galería Monarca',
+                            customLegend: globalCategory.value === 'instalaciones' ? 'Instalaciones' : 'Galería',
                             dateStr: getFormattedDate(fileDate)
                         };
                         imageFiles.push(imgData);
@@ -113,7 +113,7 @@
             const val = globalCategory.value;
             imageFiles.forEach(item => {
                 item.category = val;
-                item.customLegend = val === 'instalaciones' ? 'Instalaciones' : 'Galería Monarca';
+                item.customLegend = val === 'instalaciones' ? 'Instalaciones' : 'Galería';
             });
             renderCards();
         });
@@ -122,7 +122,7 @@
             const val = globalKeepOriginal.checked;
             imageFiles.forEach(item => {
                 item.keepOriginal = val;
-                item.customName = val ? item.originalNameSanitized : 'monarca';
+                item.customName = val ? item.originalNameSanitized : 'imagen';
             });
             renderCards();
         });
@@ -162,7 +162,7 @@
                 const card = document.createElement('div');
                 card.className = "bg-slate-800 rounded-xl border border-slate-700 p-4 flex flex-col gap-3 shadow-md";
                 
-                const finalGeneratedName = `${item.dateStr}_${item.customName || 'monarca'}.webp`;
+                const finalGeneratedName = `${item.dateStr}_${item.customName || 'imagen'}.webp`;
 
                 card.innerHTML = `
                     <div class="relative rounded-lg overflow-hidden bg-slate-950 aspect-video flex items-center justify-center border border-slate-700">
@@ -279,7 +279,7 @@
                     if(e.target.value === 'instalaciones') {
                         imageFiles[idx].customLegend = 'Instalaciones';
                     } else {
-                        imageFiles[idx].customLegend = 'Galería Monarca';
+                        imageFiles[idx].customLegend = 'Galería';
                     }
                     renderCards();
                 });
@@ -350,7 +350,7 @@
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = `${item.dateStr}_${item.customName || 'monarca'}.webp`;
+                a.download = `${item.dateStr}_${item.customName || 'imagen'}.webp`;
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
