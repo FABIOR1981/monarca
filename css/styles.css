@@ -77,7 +77,8 @@ nav a:hover {
 /* Hero Section */
 .hero {
     height: 100vh;
-    background: linear-gradient(rgba(44, 53, 45, 0.5), rgba(44, 53, 45, 0.6)), url('../images/fachada.jpeg') center/cover no-repeat;
+    /* Aquí actualizamos la ruta a ../img/instalaciones/fachada.jpeg */
+    background: linear-gradient(rgba(44, 53, 45, 0.5), rgba(44, 53, 45, 0.6)), url('../img/instalaciones/fachada.jpeg') center/cover no-repeat;
     display: flex;
     align-items: center;
     justify-content: center;
