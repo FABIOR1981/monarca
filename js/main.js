@@ -14,7 +14,8 @@ document.addEventListener('DOMContentLoaded', () => {
     
     filterBtns.forEach(btn => {
         btn.addEventListener('click', () => {
-            document.querySelector('.filter-btn.active').classList.remove('active');
+            const currentActive = document.querySelector('.filter-btn.active');
+            if (currentActive) currentActive.classList.remove('active');
             btn.classList.add('active');
 
             const filterValue = btn.getAttribute('data-filter');
@@ -33,7 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 3. Cargar Galería Dinámica desde Cloudinary
     const galeriaDinamica = document.getElementById('galeria-dinamica');
-    const cloudName = 'p0qlmlor';       // Tu Cloud Name
+    const cloudName = 'p0qlmlor';       // Cloud Name
     const tag = 'monarca_galeria';      // Etiqueta asignada a las fotos en Cloudinary
     
     if (galeriaDinamica) {
@@ -44,10 +45,9 @@ document.addEventListener('DOMContentLoaded', () => {
             })
             .then(data => {
                 const imagenes = data.resources || [];
-                //const imagenes = (data.resources || []).reverse();
 
                 if (imagenes.length === 0) {
-                    galeriaDinamica.innerHTML = '<p style="grid-column: 1 / -1; text-align: center; color: #666;">Próximamente compartiremos más momentos.</p>';
+                    galeriaDinamica.innerHTML = '<p style="grid-column: 1 / -1; text-align: center; color: var(--text-muted);">Próximamente compartiremos más momentos.</p>';
                     return;
                 }
 
@@ -70,7 +70,7 @@ document.addEventListener('DOMContentLoaded', () => {
             })
             .catch(error => {
                 console.error('Error cargando la galería desde Cloudinary:', error);
-                galeriaDinamica.innerHTML = '<p style="grid-column: 1 / -1; text-align: center; color: #666;">Próximamente compartiremos más momentos.</p>';
+                galeriaDinamica.innerHTML = '<p style="grid-column: 1 / -1; text-align: center; color: var(--text-muted);">Próximamente compartiremos más momentos.</p>';
                 inicializarLightbox(); // Inicializa para las fotos fijas si la API falla
             });
     } else {
@@ -108,7 +108,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!lightbox || !lightboxImg || !lightboxClose) return;
 
         allGalleryItems.forEach(item => {
-            // Prevenir múltiples eventos si se llama varias veces
+            // Prevenir múltiples eventos clonando el nodo
             const nuevoItem = item.cloneNode(true);
             item.parentNode.replaceChild(nuevoItem, item);
             
@@ -129,6 +129,22 @@ document.addEventListener('DOMContentLoaded', () => {
             if (e.target !== lightboxImg) {
                 lightbox.style.display = 'none';
             }
+        });
+    }
+
+    // 6. Conmutador de Temas / Estéticas
+    const themeSelector = document.getElementById('theme-selector');
+
+    if (themeSelector) {
+        // Recuperar el tema previo guardado o usar 'opcion0' por defecto
+        const savedTheme = localStorage.getItem('monarca_theme') || 'opcion0';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        themeSelector.value = savedTheme;
+
+        themeSelector.addEventListener('change', (e) => {
+            const selectedTheme = e.target.value;
+            document.documentElement.setAttribute('data-theme', selectedTheme);
+            localStorage.setItem('monarca_theme', selectedTheme);
         });
     }
 });
