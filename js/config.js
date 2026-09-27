@@ -8,5 +8,5 @@ const CONFIG = {
   // 'opcion1' -> Minimalista Editorial
   // 'opcion2' -> Dark Mode Lujo
   // 'opcion3' -> Orgánico Eco-Moderno
-  TEMA_DEFINITIVO: 'opcion2'
+  TEMA_DEFINITIVO: 'opcion0'
 };
