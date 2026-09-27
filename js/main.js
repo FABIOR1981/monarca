@@ -132,19 +132,43 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 6. Conmutador de Temas / Estéticas
+    // 6. Conmutador de Temas / Estéticas basado en config.js
     const themeSelector = document.getElementById('theme-selector');
+    const themeWidget = document.querySelector('.theme-switch-widget');
 
-    if (themeSelector) {
-        // Recuperar el tema previo guardado o usar 'opcion0' por defecto
-        const savedTheme = localStorage.getItem('monarca_theme') || 'opcion0';
-        document.documentElement.setAttribute('data-theme', savedTheme);
-        themeSelector.value = savedTheme;
+    // Comprobar la configuración general en config.js
+    const modoPruebas = (typeof CONFIG !== 'undefined' && typeof CONFIG.MODO_PRUEBAS !== 'undefined') 
+        ? CONFIG.MODO_PRUEBAS 
+        : true;
 
-        themeSelector.addEventListener('change', (e) => {
-            const selectedTheme = e.target.value;
-            document.documentElement.setAttribute('data-theme', selectedTheme);
-            localStorage.setItem('monarca_theme', selectedTheme);
-        });
+    if (!modoPruebas) {
+        // MODO PRODUCCIÓN: Oculta el selector y fija la estética elegida
+        const temaFijo = (typeof CONFIG !== 'undefined' && CONFIG.TEMA_DEFINITIVO) 
+            ? CONFIG.TEMA_DEFINITIVO 
+            : 'opcion0';
+        
+        document.documentElement.setAttribute('data-theme', temaFijo);
+        if (themeWidget) {
+            themeWidget.style.display = 'none';
+        }
+    } else {
+        // MODO PRUEBAS: Habilita el selector flotante
+        if (themeSelector && themeWidget) {
+            themeWidget.style.display = 'flex';
+            
+            const defaultTheme = (typeof CONFIG !== 'undefined' && CONFIG.TEMA_DEFINITIVO) 
+                ? CONFIG.TEMA_DEFINITIVO 
+                : 'opcion0';
+            const savedTheme = localStorage.getItem('monarca_theme') || defaultTheme;
+            
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            themeSelector.value = savedTheme;
+
+            themeSelector.addEventListener('change', (e) => {
+                const selectedTheme = e.target.value;
+                document.documentElement.setAttribute('data-theme', selectedTheme);
+                localStorage.setItem('monarca_theme', selectedTheme);
+            });
+        }
     }
 });
