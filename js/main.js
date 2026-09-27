@@ -136,10 +136,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const themeSelector = document.getElementById('theme-selector');
     const themeWidget = document.querySelector('.theme-switch-widget');
 
-    // Comprobar la configuración general en config.js
-    const modoPruebas = (typeof CONFIG !== 'undefined' && typeof CONFIG.MODO_PRUEBAS !== 'undefined') 
-        ? CONFIG.MODO_PRUEBAS 
-        : true;
+    // Permite forzar el modo pruebas por URL sin tocar config.js ni afectar a otros visitantes:
+    // https://tu-sitio/?modo=pruebas
+    const urlParams = new URLSearchParams(window.location.search);
+    const forzarPruebasPorUrl = urlParams.get('modo') === 'pruebas';
+
+    // Comprobar la configuración general en config.js (la URL tiene prioridad)
+    const modoPruebas = forzarPruebasPorUrl || ((typeof CONFIG !== 'undefined' && typeof CONFIG.MODO_PRUEBAS !== 'undefined')
+        ? CONFIG.MODO_PRUEBAS
+        : true);
 
     if (!modoPruebas) {
         // MODO PRODUCCIÓN: Oculta el selector y fija la estética elegida
