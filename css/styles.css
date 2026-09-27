@@ -53,20 +53,35 @@
     --border-card: 1px solid rgba(212, 175, 55, 0.2);
 }
 
-/* Opción 3: Orgánico Eco-Moderno */
+/* Opción 3: Orgánico Eco-Moderno — variante accesible (contraste WCAG AA verificado) */
 [data-theme="opcion3"] {
-    --primary: #3F5E4D;       /* Verde Bosque Salvia */
-    --primary-dark: #2A4034;
-    --accent: #7A9A60;       /* Verde Hoja */
-    --bg-light: #F2F5F0;
-    --text-main: #26332B;
-    --text-muted: #5C6E62;
+    --primary: #2E4736;       /* Verde Bosque, más oscuro que la v1 para reforzar contraste en texto/íconos */
+    --primary-dark: #1C2C22;
+    --accent: #52703F;       /* Verde Hoja recalculado: con texto blanco encima da ~4.9:1 (antes ~3.2:1, no pasaba AA) */
+    --bg-light: #F4F6F1;
+    --text-main: #1E2A20;     /* Casi negro-verde: ~15:1 sobre el fondo, máxima legibilidad */
+    --text-muted: #47563E;    /* Reforzado: ~7.2:1 sobre el fondo (antes ~4.9:1, al límite) */
     --white: #FFFFFF;
     --font-heading: 'Plus Jakarta Sans', sans-serif;
     --font-body: 'Plus Jakarta Sans', sans-serif;
     --card-radius: 20px;
-    --shadow: 0 12px 32px rgba(63, 94, 77, 0.08);
-    --border-card: 1px solid rgba(122, 154, 96, 0.15);
+    --shadow: 0 12px 32px rgba(46, 71, 54, 0.10);
+    --border-card: 1px solid rgba(82, 112, 63, 0.28); /* borde más marcado: se distingue sin depender solo de la sombra */
+}
+
+/* Ajustes de legibilidad de la Opción 3 (mismo layout, solo tipografía/foco) */
+[data-theme="opcion3"] body {
+    font-size: 1.0625rem; /* ~17px en vez de 16px por defecto */
+    line-height: 1.75;    /* más aire entre líneas que el 1.6 general del sitio */
+    letter-spacing: 0.005em;
+}
+
+[data-theme="opcion3"] a:focus-visible,
+[data-theme="opcion3"] button:focus-visible,
+[data-theme="opcion3"] .btn:focus-visible,
+[data-theme="opcion3"] select:focus-visible {
+    outline: 3px solid var(--accent);
+    outline-offset: 3px;
 }
 
 :root {
