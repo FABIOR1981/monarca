@@ -90,11 +90,13 @@
         <div id="cardsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
     </div>
 
+    <script src="js/config.js"></script>
     <script>
-        // --- Configuración fija del proyecto Monarca (no editable desde la UI) ---
-        const CLOUD_NAME = 'p0qlmlor';
-        const UPLOAD_PRESET = 'subir_gestor';
-        const BASE_FOLDER = 'monarca';
+        // --- Configuración de Cloudinary: se define en js/config.js (no editable desde la UI) ---
+        const cfgCloudinary = (typeof CONFIG !== 'undefined' && CONFIG.CLOUDINARY) ? CONFIG.CLOUDINARY : {};
+        const CLOUD_NAME = cfgCloudinary.CLOUD_NAME;
+        const UPLOAD_PRESET = cfgCloudinary.UPLOAD_PRESET;
+        const BASE_FOLDER = cfgCloudinary.CARPETA_BASE;
         const NEW_FOLDER_OPTION = '__nueva__';
         const LAST_FOLDER_KEY = 'monarca_ultima_carpeta_v1';
 
@@ -506,6 +508,9 @@
             }
 
             try {
+                if (!CLOUD_NAME || !UPLOAD_PRESET || !BASE_FOLDER) {
+                    throw new Error('Falta configuración de Cloudinary en js/config.js (CLOUD_NAME, UPLOAD_PRESET y CARPETA_BASE).');
+                }
                 const blob = await buildProcessedBlob(item);
                 const finalName = getFinalName(item);
 
