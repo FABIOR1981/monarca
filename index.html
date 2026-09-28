@@ -307,18 +307,18 @@
             <p>¿Querés coordinar una visita o tenés alguna consulta? Estamos para escucharte y asesorarte de forma personalizada.</p>
             <p style="margin-top: 1.5rem; font-weight: 500;">
                 <i class="fas fa-map-marker-alt" style="color: var(--primary); margin-right: 8px;"></i>
-                <strong>DIRECCIÓN:</strong> Rivera 5734 esquina Vicente Rocafuerte
+                <strong>DIRECCIÓN:</strong> <span data-config="direccion">Rivera 5734 esquina Vicente Rocafuerte</span>
             </p>
             <div class="social-icons">
-                <a href="https://whatsapp.com" target="_blank" title="WhatsApp"><i class="fab fa-whatsapp"></i></a>
-                <a href="https://instagram.com" target="_blank" title="Instagram"><i class="fab fa-instagram"></i></a>
-                <a href="https://facebook.com" target="_blank" title="Facebook"><i class="fab fa-facebook-f"></i></a>
-                <a href="https://maps.google.com/?q=Rivera+5734+esquina+Vicente+Rocafuerte" target="_blank" title="Ubicación"><i class="fas fa-map-marker-alt"></i></a>
+                <a href="https://whatsapp.com" data-config="whatsapp" target="_blank" title="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+                <a href="https://instagram.com" data-config="instagram" target="_blank" title="Instagram"><i class="fab fa-instagram"></i></a>
+                <a href="https://facebook.com" data-config="facebook" target="_blank" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+                <a href="https://maps.google.com/?q=Rivera+5734+esquina+Vicente+Rocafuerte" data-config="mapa" target="_blank" title="Ubicación"><i class="fas fa-map-marker-alt"></i></a>
             </div>
         </div>
     </section>
 
-    <a href="https://whatsapp.com" class="whatsapp-float" target="_blank">
+    <a href="https://whatsapp.com" data-config="whatsapp" class="whatsapp-float" target="_blank">
         <i class="fab fa-whatsapp"></i>
     </a>
 
@@ -327,6 +327,7 @@
     </footer>
 
     <!-- Scripts -->
+    <script src="js/config.js"></script>
     <script src="js/main.js"></script>
 </body>
 </html>

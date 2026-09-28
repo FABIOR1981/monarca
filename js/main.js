@@ -34,10 +34,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 3. Cargar Galería Dinámica desde Cloudinary
     const galeriaDinamica = document.getElementById('galeria-dinamica');
-    const cloudName = 'p0qlmlor';       // Cloud Name
-    const tag = 'monarca_galeria';      // Etiqueta asignada a las fotos en Cloudinary
+    // Los datos de Cloudinary se definen en js/config.js
+    const cfgCloudinary = (typeof CONFIG !== 'undefined' && CONFIG.CLOUDINARY) ? CONFIG.CLOUDINARY : {};
+    const cloudName = cfgCloudinary.CLOUD_NAME;
+    const tag = cfgCloudinary.TAG_GALERIA;
     
-    if (galeriaDinamica) {
+    if (galeriaDinamica && cloudName && tag) {
         fetch(`https://res.cloudinary.com/${cloudName}/image/list/${tag}.json`)
             .then(response => {
                 if (!response.ok) throw new Error("No se pudo obtener la lista de Cloudinary. Verifica el Tag o la opción 'Resource list' en Security.");
@@ -130,5 +132,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 lightbox.style.display = 'none';
             }
         });
+    }
+
+    // 5. Datos de contacto y redes desde config.js
+    // Si un valor está vacío, se deja el enlace/texto que ya trae index.html.
+    const cfgContacto = (typeof CONFIG !== 'undefined' && CONFIG.CONTACTO) ? CONFIG.CONTACTO : {};
+
+    function asignarEnlace(clave, url) {
+        if (!url) return;
+        document.querySelectorAll(`[data-config="${clave}"]`).forEach(el => { el.href = url; });
+    }
+
+    asignarEnlace('whatsapp', cfgContacto.WHATSAPP_NUMERO && `https://wa.me/${cfgContacto.WHATSAPP_NUMERO}`);
+    asignarEnlace('instagram', cfgContacto.INSTAGRAM_URL);
+    asignarEnlace('facebook', cfgContacto.FACEBOOK_URL);
+
+    if (cfgContacto.DIRECCION) {
+        document.querySelectorAll('[data-config="direccion"]').forEach(el => { el.textContent = cfgContacto.DIRECCION; });
+        asignarEnlace('mapa', `https://maps.google.com/?q=${encodeURIComponent(cfgContacto.DIRECCION)}`);
     }
 });
