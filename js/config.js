@@ -8,6 +8,7 @@ const CONFIG = {
     CLOUD_NAME: 'p0qlmlor',        // Cloud name de la cuenta
     UPLOAD_PRESET: 'subir_gestor',              // Preset unsigned de subida de Cloudinary
     CARPETA_BASE: 'monarca',        // Carpeta raíz para las imágenes subidas
+    CARPETA_DEFAULT: 'galeria',     // Subcarpeta seleccionada por defecto
     TAG_GALERIA: 'monarca_galeria'  // Etiqueta que llevan las fotos de la galería
   },
 

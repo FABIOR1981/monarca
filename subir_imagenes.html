@@ -134,7 +134,8 @@
         function getLastFolder() {
             const last = localStorage.getItem(LAST_FOLDER_KEY);
             const folders = loadFolders();
-            return (last && folders.find(f => f.value === last)) ? last : folders[0].value;
+            const defaultFolder = cfgCloudinary.CARPETA_DEFAULT || folders[0].value;
+            return (last && folders.find(f => f.value === last)) ? last : defaultFolder;
         }
 
         function setLastFolder(value) {
