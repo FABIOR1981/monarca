@@ -6,7 +6,9 @@ const CONFIG = {
   // --- Galería dinámica (Cloudinary) ---
   CLOUDINARY: {
     CLOUD_NAME: 'p0qlmlor',        // Cloud name de la cuenta
-    TAG_GALERIA: 'monarca_galeria' // Etiqueta que llevan las fotos de la galería
+    UPLOAD_PRESET: 'subir_gestor',              // Preset unsigned de subida de Cloudinary
+    CARPETA_BASE: 'monarca',        // Carpeta raíz para las imágenes subidas
+    TAG_GALERIA: 'monarca_galeria'  // Etiqueta que llevan las fotos de la galería
   },
 
   // --- Contacto y redes ---
