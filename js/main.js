@@ -49,12 +49,17 @@ document.addEventListener('DOMContentLoaded', () => {
         }[caracter]));
     }
 
-    function obtenerLeyenda(imagen) {
-        const leyenda = imagen.context?.custom?.caption || imagen.context?.caption;
-        if (leyenda && leyenda.trim()) return leyenda.trim();
+    function obtenerTitulo(imagen) {
+        const titulo = imagen.context?.custom?.title || imagen.context?.title;
+        if (titulo && titulo.trim()) return titulo.trim();
 
         const nombre = imagen.public_id.split('/').pop().replace(/[-_]+/g, ' ').trim();
         return nombre ? nombre.charAt(0).toUpperCase() + nombre.slice(1) : 'Actividad en Monarca';
+    }
+
+    function obtenerDescripcion(imagen) {
+        const descripcion = imagen.context?.custom?.caption || imagen.context?.caption;
+        return descripcion && descripcion.trim() ? descripcion.trim() : '';
     }
     
     if (galeriaDinamica && cloudName && tag) {
@@ -74,13 +79,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Generar HTML por cada imagen aprovechando la optimización automática (q_auto, f_auto)
                 const htmlImagenes = imagenes.map(img => {
                     const urlImagen = `https://res.cloudinary.com/${cloudName}/image/upload/q_auto,f_auto/v${img.version}/${img.public_id}.${img.format}`;
-                    const leyenda = escaparHtml(obtenerLeyenda(img));
+                    const titulo = escaparHtml(obtenerTitulo(img));
+                    const descripcion = escaparHtml(obtenerDescripcion(img));
                     
                     return `
                         <div class="gallery-item">
-                            <img src="${urlImagen}" alt="${leyenda}" loading="lazy">
+                            <img src="${urlImagen}" alt="${titulo}${descripcion ? `: ${descripcion}` : ''}" loading="lazy">
                             <div class="gallery-overlay">
-                                <h3>${leyenda}</h3>
+                                <h3>${titulo}</h3>
+                                ${descripcion ? `<p>${descripcion}</p>` : ''}
                             </div>
                         </div>
                     `;
