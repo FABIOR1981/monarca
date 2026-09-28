@@ -131,49 +131,4 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-
-    // 6. Conmutador de Temas / Estéticas basado en config.js
-    const themeSelector = document.getElementById('theme-selector');
-    const themeWidget = document.querySelector('.theme-switch-widget');
-
-    // Permite forzar el modo pruebas por URL sin tocar config.js ni afectar a otros visitantes:
-    // https://tu-sitio/?modo=pruebas
-    const urlParams = new URLSearchParams(window.location.search);
-    const forzarPruebasPorUrl = urlParams.get('modo') === 'pruebas';
-
-    // Comprobar la configuración general en config.js (la URL tiene prioridad)
-    const modoPruebas = forzarPruebasPorUrl || ((typeof CONFIG !== 'undefined' && typeof CONFIG.MODO_PRUEBAS !== 'undefined')
-        ? CONFIG.MODO_PRUEBAS
-        : true);
-
-    if (!modoPruebas) {
-        // MODO PRODUCCIÓN: Oculta el selector y fija la estética elegida
-        const temaFijo = (typeof CONFIG !== 'undefined' && CONFIG.TEMA_DEFINITIVO) 
-            ? CONFIG.TEMA_DEFINITIVO 
-            : 'opcion0';
-        
-        document.documentElement.setAttribute('data-theme', temaFijo);
-        if (themeWidget) {
-            themeWidget.style.display = 'none';
-        }
-    } else {
-        // MODO PRUEBAS: Habilita el selector flotante
-        if (themeSelector && themeWidget) {
-            themeWidget.style.display = 'flex';
-            
-            const defaultTheme = (typeof CONFIG !== 'undefined' && CONFIG.TEMA_DEFINITIVO) 
-                ? CONFIG.TEMA_DEFINITIVO 
-                : 'opcion0';
-            const savedTheme = localStorage.getItem('monarca_theme') || defaultTheme;
-            
-            document.documentElement.setAttribute('data-theme', savedTheme);
-            themeSelector.value = savedTheme;
-
-            themeSelector.addEventListener('change', (e) => {
-                const selectedTheme = e.target.value;
-                document.documentElement.setAttribute('data-theme', selectedTheme);
-                localStorage.setItem('monarca_theme', selectedTheme);
-            });
-        }
-    }
 });
