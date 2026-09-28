@@ -219,6 +219,13 @@ section {
     margin-bottom: 0.2rem;
 }
 
+.director-name {
+    color: var(--text-main);
+    font-weight: 700;
+    font-size: 1.05rem;
+    margin-bottom: 0.15rem;
+}
+
 .director-subtitle {
     color: var(--text-muted);
     font-size: 0.95rem;
