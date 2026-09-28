@@ -526,8 +526,8 @@
                 const title = (item.customTitle || '').trim().replace(/[|]/g, ' ');
                 const description = (item.customDescription || '').trim().replace(/[|]/g, ' ');
                 const context = [
-                    title ? `title=${title}` : '',
-                    description ? `caption=${description}` : ''
+                    title ? `caption=${title}` : '',
+                    description ? `alt=${description}` : ''
                 ].filter(Boolean).join('|');
                 if (context) {
                     formData.append('context', context);

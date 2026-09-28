@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function obtenerTitulo(imagen) {
-        const titulo = imagen.context?.custom?.title || imagen.context?.title;
+        const titulo = imagen.context?.caption;
         if (titulo && titulo.trim()) return titulo.trim();
 
         const nombre = imagen.public_id.split('/').pop().replace(/[-_]+/g, ' ').trim();
@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function obtenerDescripcion(imagen) {
-        const descripcion = imagen.context?.custom?.caption || imagen.context?.caption;
+        const descripcion = imagen.context?.alt;
         return descripcion && descripcion.trim() ? descripcion.trim() : '';
     }
     
