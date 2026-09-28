@@ -38,6 +38,24 @@ document.addEventListener('DOMContentLoaded', () => {
     const cfgCloudinary = (typeof CONFIG !== 'undefined' && CONFIG.CLOUDINARY) ? CONFIG.CLOUDINARY : {};
     const cloudName = cfgCloudinary.CLOUD_NAME;
     const tag = cfgCloudinary.TAG_GALERIA;
+
+    function escaparHtml(texto) {
+        return String(texto).replace(/[&<>'"]/g, caracter => ({
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            "'": '&#39;',
+            '"': '&quot;'
+        }[caracter]));
+    }
+
+    function obtenerLeyenda(imagen) {
+        const leyenda = imagen.context?.custom?.caption || imagen.context?.caption;
+        if (leyenda && leyenda.trim()) return leyenda.trim();
+
+        const nombre = imagen.public_id.split('/').pop().replace(/[-_]+/g, ' ').trim();
+        return nombre ? nombre.charAt(0).toUpperCase() + nombre.slice(1) : 'Actividad en Monarca';
+    }
     
     if (galeriaDinamica && cloudName && tag) {
         fetch(`https://res.cloudinary.com/${cloudName}/image/list/${tag}.json`)
@@ -56,11 +74,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Generar HTML por cada imagen aprovechando la optimización automática (q_auto, f_auto)
                 const htmlImagenes = imagenes.map(img => {
                     const urlImagen = `https://res.cloudinary.com/${cloudName}/image/upload/q_auto,f_auto/v${img.version}/${img.public_id}.${img.format}`;
+                    const leyenda = escaparHtml(obtenerLeyenda(img));
                     
                     return `
                         <div class="gallery-item">
-                            <img src="${urlImagen}" alt="Actividad en Monarca" loading="lazy">
-                            <div class="gallery-overlay"></div>
+                            <img src="${urlImagen}" alt="${leyenda}" loading="lazy">
+                            <div class="gallery-overlay">
+                                <h3>${leyenda}</h3>
+                            </div>
                         </div>
                     `;
                 }).join('');

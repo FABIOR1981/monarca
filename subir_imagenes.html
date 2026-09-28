@@ -520,6 +520,9 @@
                 formData.append('public_id', finalName);
                 formData.append('folder', folderPath);
                 formData.append('tags', tag);
+                if (item.customLegend && item.customLegend.trim()) {
+                    formData.append('context', `caption=${item.customLegend.trim()}`);
+                }
 
                 const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, {
                     method: 'POST',
