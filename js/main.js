@@ -7,6 +7,13 @@ document.addEventListener('DOMContentLoaded', () => {
         mobileMenu.addEventListener('click', () => {
             navList.classList.toggle('active');
         });
+
+        // Cerrar el menú al elegir una opción (en mobile no se colapsaba solo)
+        navList.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                navList.classList.remove('active');
+            });
+        });
     }
 
     // 2. Filtrado de Galería (Instalaciones)
