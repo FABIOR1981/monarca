@@ -68,7 +68,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                 </svg>
                 <span class="text-sm font-medium" style="color:var(--text-main);">Arrastra tus imágenes aquí o <span class="underline" style="color:var(--primary);">haz clic para buscar</span></span>
-                <span class="text-sm mt-1" style="color:var(--text-muted);">Soporta múltiples archivos PNG, JPG, WEBP (Máx. 5MB por archivo)</span>
+                <span class="text-sm mt-1" style="color:var(--text-muted);">Soporta múltiples archivos PNG, JPG, WEBP de cualquier tamaño (el navegador los optimiza)</span>
                 <input type="file" id="fileInput" multiple accept="image/*" class="hidden">
             </label>
         </div>
@@ -96,7 +96,6 @@
         const BASE_FOLDER = 'monarca';
         const NEW_FOLDER_OPTION = '__nueva__';
         const LAST_FOLDER_KEY = 'monarca_ultima_carpeta_v1';
-        const MAX_FILE_SIZE_MB = 5; // Límite de tamaño añadido
 
         const fileInput = document.getElementById('fileInput');
         const cardsContainer = document.getElementById('cardsContainer');
@@ -200,12 +199,6 @@
 
             files.forEach(file => {
                 if (!file.type.startsWith('image/')) return;
-
-                // Validación de tamaño máximo (5MB)
-                if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
-                    alert(`La imagen "${file.name}" supera los ${MAX_FILE_SIZE_MB}MB permitidos y fue omitida.`);
-                    return;
-                }
 
                 const reader = new FileReader();
                 reader.onload = (event) => {
