@@ -37,16 +37,25 @@
             </div>
             <div class="flex flex-wrap items-end gap-4 bg-white p-3 rounded-xl border" style="border-color:#E7E3DC;">
                 <div>
-                    <label for="globalCategory" class="text-sm font-medium block mb-1" style="color:var(--text-muted);">Carpeta por defecto para lo próximo que cargues</label>
+                    <label for="globalCategory" class="text-sm font-medium block mb-1" style="color:var(--text-muted);">Carpeta por defecto</label>
                     <select id="globalCategory" class="border rounded px-2 py-1.5 text-sm focus-ring" style="border-color:#D8D3C8; color:var(--primary-dark);"></select>
                 </div>
                 <div>
-                    <label for="globalTitle" class="text-sm font-medium block mb-1" style="color:var(--text-muted);">Título para las próximas imágenes</label>
-                    <input type="text" id="globalTitle" placeholder="Ej.: Fiesta de fin de año 2026" class="border rounded px-2 py-1.5 text-sm focus-ring" style="border-color:#D8D3C8; color:var(--primary-dark);">
+                    <label for="globalMaxWidth" class="text-sm font-medium block mb-1" style="color:var(--text-muted);">Ancho Máx. (Redimensión)</label>
+                    <select id="globalMaxWidth" class="border rounded px-2 py-1.5 text-sm focus-ring" style="border-color:#D8D3C8; color:var(--primary-dark);">
+                        <option value="800">800 px (Liviana)</option>
+                        <option value="1200" selected>1200 px (Estándar)</option>
+                        <option value="1920">1920 px (Alta)</option>
+                        <option value="0">Original (Sin redimensionar)</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="globalTitle" class="text-sm font-medium block mb-1" style="color:var(--text-muted);">Título global</label>
+                    <input type="text" id="globalTitle" placeholder="Ej.: Fiesta 2026" class="border rounded px-2 py-1.5 text-sm focus-ring" style="border-color:#D8D3C8; color:var(--primary-dark);">
                 </div>
                 <div class="flex items-center gap-2 border-l pl-4" style="border-color:#E7E3DC;">
                     <input type="checkbox" id="globalKeepOriginal" checked class="w-4 h-4 cursor-pointer" style="accent-color:var(--accent);">
-                    <label for="globalKeepOriginal" class="text-sm cursor-pointer">Respetar nombre original</label>
+                    <label for="globalKeepOriginal" class="text-sm cursor-pointer">Respetar nombre</label>
                 </div>
                 <div class="flex items-center gap-2 border-l pl-4" style="border-color:#E7E3DC;">
                     <label for="globalQuality" class="text-sm">Calidad (<span id="qualityVal">80</span>%)</label>
@@ -55,13 +64,8 @@
             </div>
         </header>
 
-        <p class="text-sm mb-2" style="color:var(--text-main);">
-            La carpeta de arriba es solo el valor que traen las <strong>próximas fotos que arrastres</strong> — pensada para cargar varias del mismo tipo de una sola vez.
-            Nunca queda fija: cada foto tiene su propio selector de carpeta abajo y lo podés cambiar cuando quieras, antes o después de subirla.
-        </p>
         <p class="text-sm mb-8" style="color:var(--text-main);">
-            Hoy el sitio muestra solo automáticamente lo que subís a <strong style="color:var(--primary-dark);">Galería</strong>. Instalaciones y cualquier carpeta nueva quedan
-            prolijamente organizadas, pero no aparecen solas en el sitio hasta que actualicemos ese bloque.
+            Configurá el ancho máximo de bajada de resolución según tus necesidades. Cada tarjeta mostrará el peso original de tu archivo y el peso optimizado resultante.
         </p>
 
         <!-- Zona de Carga -->
@@ -72,7 +76,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                 </svg>
                 <span class="text-sm font-medium" style="color:var(--text-main);">Arrastra tus imágenes aquí o <span class="underline" style="color:var(--primary);">haz clic para buscar</span></span>
-                <span class="text-sm mt-1" style="color:var(--text-muted);">Soporta múltiples archivos PNG, JPG, WEBP (Redimensiona a máx. 1200px)</span>
+                <span class="text-sm mt-1" style="color:var(--text-muted);">Soporta múltiples archivos PNG, JPG, WEBP</span>
                 <input type="file" id="fileInput" multiple accept="image/*" class="hidden">
             </label>
         </div>
@@ -96,18 +100,17 @@
 
     <script src="js/config.js"></script>
     <script>
-        // --- Configuración de Cloudinary: se define en js/config.js (no editable desde la UI) ---
         const cfgCloudinary = (typeof CONFIG !== 'undefined' && CONFIG.CLOUDINARY) ? CONFIG.CLOUDINARY : {};
         const CLOUD_NAME = cfgCloudinary.CLOUD_NAME;
         const UPLOAD_PRESET = cfgCloudinary.UPLOAD_PRESET;
         const BASE_FOLDER = cfgCloudinary.CARPETA_BASE;
         const NEW_FOLDER_OPTION = '__nueva__';
         const LAST_FOLDER_KEY = 'monarca_ultima_carpeta_v1';
-        const MAX_WIDTH = 1200; // Límite máximo de ancho en píxeles
 
         const fileInput = document.getElementById('fileInput');
         const cardsContainer = document.getElementById('cardsContainer');
         const globalCategory = document.getElementById('globalCategory');
+        const globalMaxWidth = document.getElementById('globalMaxWidth');
         const globalTitle = document.getElementById('globalTitle');
         const globalKeepOriginal = document.getElementById('globalKeepOriginal');
         const globalQuality = document.getElementById('globalQuality');
@@ -117,7 +120,6 @@
         const downloadAllBtn = document.getElementById('downloadAllBtn');
         const uploadAllBtn = document.getElementById('uploadAllBtn');
 
-        // --- Subcarpetas conocidas (recordadas en este navegador) ---
         const FOLDERS_KEY = 'monarca_subcarpetas_v1';
         const DEFAULT_FOLDERS = [
             { value: 'galeria', label: 'Galería' },
@@ -197,11 +199,16 @@
             });
         });
 
-        // --- Imágenes ---
         let imageFiles = [];
 
         globalQuality.addEventListener('input', (e) => {
             qualityVal.textContent = e.target.value;
+        });
+
+        globalMaxWidth.addEventListener('change', () => {
+            const maxWidthVal = parseInt(globalMaxWidth.value);
+            imageFiles.forEach(item => { item.maxWidth = maxWidthVal; });
+            renderCards();
         });
 
         fileInput.addEventListener('change', (e) => {
@@ -233,6 +240,7 @@
                             category: defaultFolder,
                             customTitle: globalTitle.value.trim(),
                             customDescription: '',
+                            maxWidth: parseInt(globalMaxWidth.value),
                             dateStr: getFormattedDate(fileDate),
                             quality: parseInt(globalQuality.value) / 100
                         };
@@ -299,13 +307,12 @@
             return item.keepOriginal ? item.originalName : `${item.dateStr}_${item.customName || 'imagen'}`;
         }
 
-        // Función para escalar dimensiones con tope de 1200px manteniendo proporción
-        function getScaledDimensions(img) {
+        function getScaledDimensions(img, maxWidth) {
             let width = img.naturalWidth;
             let height = img.naturalHeight;
-            if (width > MAX_WIDTH) {
-                height = Math.round((height * MAX_WIDTH) / width);
-                width = MAX_WIDTH;
+            if (maxWidth > 0 && width > maxWidth) {
+                height = Math.round((height * maxWidth) / width);
+                width = maxWidth;
             }
             return { width, height };
         }
@@ -335,7 +342,7 @@
                             <span>Original: <strong style="color:var(--text-main);">${formatBytes(item.originalSize)}</strong></span>
                             <div class="flex items-center gap-1.5">
                                 <input type="checkbox" data-index="${index}" class="card-keep-original w-3.5 h-3.5 cursor-pointer" style="accent-color:var(--accent);" ${item.keepOriginal ? 'checked' : ''}>
-                                <span class="cursor-pointer">Respetar original</span>
+                                <span class="cursor-pointer">Respetar nombre</span>
                             </div>
                         </div>
 
@@ -354,14 +361,22 @@
                                     ${buildFolderOptionsHtml(item.category)}
                                 </select>
                             </div>
-                            <div></div>
+                            <div>
+                                <label class="text-sm" style="color:var(--text-muted);">Ancho máx. (px):</label>
+                                <select data-index="${index}" class="card-maxwidth-select w-full border rounded px-2 py-1 text-sm focus-ring" style="border-color:#D8D3C8;">
+                                    <option value="800" ${item.maxWidth === 800 ? 'selected' : ''}>800 px</option>
+                                    <option value="1200" ${item.maxWidth === 1200 ? 'selected' : ''}>1200 px</option>
+                                    <option value="1920" ${item.maxWidth === 1920 ? 'selected' : ''}>1920 px</option>
+                                    <option value="0" ${item.maxWidth === 0 ? 'selected' : ''}>Original</option>
+                                </select>
+                            </div>
                             <div class="col-span-2">
                                 <label class="text-sm" style="color:var(--text-muted);">Título:</label>
                                 <input type="text" value="${escapeHtml(item.customTitle)}" data-index="${index}" placeholder="Título de la actividad" class="title-input w-full border rounded px-2 py-1 text-sm focus-ring" style="border-color:#D8D3C8;">
                             </div>
                             <div class="col-span-2">
                                 <label class="text-sm" style="color:var(--text-muted);">Descripción:</label>
-                                <textarea data-index="${index}" placeholder="Descripción de esta imagen (opcional)" class="description-input w-full border rounded px-2 py-1 text-sm focus-ring" rows="2" style="border-color:#D8D3C8;">${escapeHtml(item.customDescription)}</textarea>
+                                <textarea data-index="${index}" placeholder="Descripción (opcional)" class="description-input w-full border rounded px-2 py-1 text-sm focus-ring" rows="2" style="border-color:#D8D3C8;">${escapeHtml(item.customDescription)}</textarea>
                             </div>
                         </div>
                         <div class="text-sm truncate mt-1 p-1.5 rounded border flex justify-between items-center" style="background:#F9F8F6; border-color:#E7E3DC; color:var(--primary-dark);">
@@ -392,7 +407,7 @@
             if (!canvas) return;
             const ctx = canvas.getContext('2d');
 
-            const { width, height } = getScaledDimensions(item.imgElement);
+            const { width, height } = getScaledDimensions(item.imgElement, item.maxWidth);
             canvas.width = width;
             canvas.height = height;
 
@@ -415,7 +430,7 @@
             return new Promise((resolve) => {
                 const canvas = document.createElement('canvas');
                 const ctx = canvas.getContext('2d');
-                const { width, height } = getScaledDimensions(item.imgElement);
+                const { width, height } = getScaledDimensions(item.imgElement, item.maxWidth);
                 canvas.width = width;
                 canvas.height = height;
                 ctx.drawImage(item.imgElement, 0, 0, width, height);
@@ -450,6 +465,14 @@
                 input.addEventListener('input', (e) => {
                     const idx = e.target.dataset.index;
                     imageFiles[idx].customDescription = e.target.value;
+                });
+            });
+
+            document.querySelectorAll('.card-maxwidth-select').forEach(sel => {
+                sel.addEventListener('change', (e) => {
+                    const idx = e.target.dataset.index;
+                    imageFiles[idx].maxWidth = parseInt(e.target.value);
+                    drawPreviewAndMeasure(idx);
                 });
             });
 
@@ -525,7 +548,7 @@
 
             try {
                 if (!CLOUD_NAME || !UPLOAD_PRESET || !BASE_FOLDER) {
-                    throw new Error('Falta configuración de Cloudinary en js/config.js (CLOUD_NAME, UPLOAD_PRESET y CARPETA_BASE).');
+                    throw new Error('Falta configuración de Cloudinary en js/config.js.');
                 }
                 const blob = await buildProcessedBlob(item);
                 const finalName = getFinalName(item);
@@ -536,6 +559,7 @@
                 formData.append('public_id', finalName);
                 formData.append('folder', folderPath);
                 formData.append('tags', tag);
+
                 const title = (item.customTitle || '').trim().replace(/[|]/g, ' ');
                 const description = (item.customDescription || '').trim().replace(/[|]/g, ' ');
                 const context = [
