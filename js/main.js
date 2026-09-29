@@ -85,7 +85,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // Generar HTML por cada imagen aprovechando la optimización automática (q_auto, f_auto)
                 const htmlImagenes = imagenes.map(img => {
-                    const urlImagen = `https://res.cloudinary.com/${cloudName}/image/upload/q_auto,f_auto/v${img.version}/${img.public_id}.${img.format}`;
+                    const urlImagen = `https://res.cloudinary.com/${cloudName}/image/upload/q_auto,f_auto,w_1200,c_limit/v${img.version}/${img.public_id}.${img.format}`;
                     const titulo = escaparHtml(obtenerTitulo(img));
                     const descripcion = escaparHtml(obtenerDescripcion(img));
                     
