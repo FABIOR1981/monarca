@@ -48,10 +48,6 @@
                     <label for="globalQuality" class="text-sm">Calidad (<span id="qualityVal">80</span>%)</label>
                     <input type="range" id="globalQuality" min="40" max="100" value="80" class="cursor-pointer w-24" style="accent-color:var(--accent);">
                 </div>
-                <div class="flex items-center gap-2 border-l pl-4" style="border-color:#E7E3DC;">
-                    <label for="globalMaxWidth" class="text-sm">Ancho máx (<span id="maxWidthVal">1200</span>px)</label>
-                    <input type="range" id="globalMaxWidth" min="600" max="2400" step="100" value="1200" class="cursor-pointer w-24" style="accent-color:var(--accent);">
-                </div>
             </div>
         </header>
 
@@ -72,7 +68,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                 </svg>
                 <span class="text-sm font-medium" style="color:var(--text-main);">Arrastra tus imágenes aquí o <span class="underline" style="color:var(--primary);">haz clic para buscar</span></span>
-                <span class="text-sm mt-1" style="color:var(--text-muted);">Soporta múltiples archivos PNG, JPG, WEBP</span>
+                <span class="text-sm mt-1" style="color:var(--text-muted);">Soporta múltiples archivos PNG, JPG, WEBP (Máx. 5MB por archivo)</span>
                 <input type="file" id="fileInput" multiple accept="image/*" class="hidden">
             </label>
         </div>
@@ -95,12 +91,12 @@
     </div>
 
     <script>
-        // --- Configuración fija del proyecto Monarca (no editable desde la UI) ---
         const CLOUD_NAME = 'p0qlmlor';
         const UPLOAD_PRESET = 'subir_gestor';
         const BASE_FOLDER = 'monarca';
         const NEW_FOLDER_OPTION = '__nueva__';
         const LAST_FOLDER_KEY = 'monarca_ultima_carpeta_v1';
+        const MAX_FILE_SIZE_MB = 5; // Límite de tamaño añadido
 
         const fileInput = document.getElementById('fileInput');
         const cardsContainer = document.getElementById('cardsContainer');
@@ -108,15 +104,11 @@
         const globalKeepOriginal = document.getElementById('globalKeepOriginal');
         const globalQuality = document.getElementById('globalQuality');
         const qualityVal = document.getElementById('qualityVal');
-        const globalMaxWidth = document.getElementById('globalMaxWidth');
-        const maxWidthVal = document.getElementById('maxWidthVal');
-
         const batchActions = document.getElementById('batchActions');
         const counterText = document.getElementById('counterText');
         const downloadAllBtn = document.getElementById('downloadAllBtn');
         const uploadAllBtn = document.getElementById('uploadAllBtn');
 
-        // --- Subcarpetas conocidas (recordadas en este navegador) ---
         const FOLDERS_KEY = 'monarca_subcarpetas_v1';
         const DEFAULT_FOLDERS = [
             { value: 'galeria', label: 'Galería' },
@@ -195,25 +187,10 @@
             });
         });
 
-        // --- Imágenes ---
         let imageFiles = [];
 
         globalQuality.addEventListener('input', (e) => {
             qualityVal.textContent = e.target.value;
-        });
-
-        globalQuality.addEventListener('change', () => {
-            const q = parseInt(globalQuality.value) / 100;
-            imageFiles.forEach(item => { item.quality = q; });
-            renderCards();
-        });
-
-        globalMaxWidth.addEventListener('input', (e) => {
-            maxWidthVal.textContent = e.target.value;
-        });
-
-        globalMaxWidth.addEventListener('change', () => {
-            renderCards(); 
         });
 
         fileInput.addEventListener('change', (e) => {
@@ -223,6 +200,12 @@
 
             files.forEach(file => {
                 if (!file.type.startsWith('image/')) return;
+
+                // Validación de tamaño máximo (5MB)
+                if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
+                    alert(`La imagen "${file.name}" supera los ${MAX_FILE_SIZE_MB}MB permitidos y fue omitida.`);
+                    return;
+                }
 
                 const reader = new FileReader();
                 reader.onload = (event) => {
@@ -243,8 +226,6 @@
                             originalName: rawName,
                             customName: 'imagen',
                             category: defaultFolder,
-                            customTitle: '',
-                            customDescription: '',
                             customLegend: '',
                             dateStr: getFormattedDate(fileDate),
                             quality: parseInt(globalQuality.value) / 100
@@ -267,6 +248,12 @@
         globalKeepOriginal.addEventListener('change', () => {
             const val = globalKeepOriginal.checked;
             imageFiles.forEach(item => { item.keepOriginal = val; });
+            renderCards();
+        });
+
+        globalQuality.addEventListener('change', () => {
+            const q = parseInt(globalQuality.value) / 100;
+            imageFiles.forEach(item => { item.quality = q; });
             renderCards();
         });
 
@@ -294,18 +281,6 @@
 
         function getFinalName(item) {
             return item.keepOriginal ? item.originalName : `${item.dateStr}_${item.customName || 'imagen'}`;
-        }
-
-        function calculateDimensions(img) {
-            let width = img.naturalWidth;
-            let height = img.naturalHeight;
-            const maxW = parseInt(globalMaxWidth.value) || 1200;
-
-            if (width > maxW) {
-                height = Math.round((height * maxW) / width);
-                width = maxW;
-            }
-            return { width, height };
         }
 
         function renderCards() {
@@ -345,16 +320,6 @@
                             <input type="text" value="${item.customName}" data-index="${index}" placeholder="Nombre corto..." class="custom-name-input w-full border rounded px-2 py-1 text-sm focus-ring" style="border-color:#D8D3C8;">
                         `}
 
-                        <!-- CAMPOS DE TÍTULO Y DESCRIPCIÓN RESTAURADOS -->
-                        <div>
-                            <label class="text-sm block mb-1" style="color:var(--text-muted);">Título visible:</label>
-                            <input type="text" value="${item.customTitle || ''}" data-index="${index}" placeholder="Ej: Jardín principal" class="title-input w-full border rounded px-2 py-1 text-sm focus-ring" style="border-color:#D8D3C8;">
-                        </div>
-                        <div>
-                            <label class="text-sm block mb-1" style="color:var(--text-muted);">Descripción:</label>
-                            <textarea data-index="${index}" placeholder="Breve descripción de la foto..." class="desc-input w-full border rounded px-2 py-1 text-sm focus-ring resize-none h-16" style="border-color:#D8D3C8;">${item.customDescription || ''}</textarea>
-                        </div>
-
                         <div class="grid grid-cols-2 gap-2 mt-1">
                             <div>
                                 <label class="text-sm" style="color:var(--text-muted);">Carpeta:</label>
@@ -363,8 +328,8 @@
                                 </select>
                             </div>
                             <div>
-                                <label class="text-sm" style="color:var(--text-muted);">Leyenda (en imagen):</label>
-                                <input type="text" value="${item.customLegend}" data-index="${index}" placeholder="Sin leyenda" class="legend-input w-full border rounded px-2 py-1 text-sm focus-ring" style="border-color:#D8D3C8;">
+                                <label class="text-sm" style="color:var(--text-muted);">Leyenda:</label>
+                                <input type="text" value="${item.customLegend}" data-index="${index}" placeholder="Sin leyenda (opcional)" class="legend-input w-full border rounded px-2 py-1 text-sm focus-ring" style="border-color:#D8D3C8;">
                             </div>
                         </div>
                         <div class="text-sm truncate mt-1 p-1.5 rounded border flex justify-between items-center" style="background:#F9F8F6; border-color:#E7E3DC; color:var(--primary-dark);">
@@ -396,12 +361,10 @@
             const ctx = canvas.getContext('2d');
 
             const img = item.imgElement;
-            const { width, height } = calculateDimensions(img);
-            
-            canvas.width = width;
-            canvas.height = height;
+            canvas.width = img.naturalWidth;
+            canvas.height = img.naturalHeight;
 
-            ctx.drawImage(img, 0, 0, width, height);
+            ctx.drawImage(img, 0, 0);
             drawLegend(ctx, canvas, item.customLegend);
 
             canvas.toBlob((blob) => {
@@ -444,14 +407,10 @@
             return new Promise((resolve) => {
                 const canvas = document.createElement('canvas');
                 const ctx = canvas.getContext('2d');
-                
-                const { width, height } = calculateDimensions(item.imgElement);
-                canvas.width = width;
-                canvas.height = height;
-                
-                ctx.drawImage(item.imgElement, 0, 0, width, height);
+                canvas.width = item.imgElement.naturalWidth;
+                canvas.height = item.imgElement.naturalHeight;
+                ctx.drawImage(item.imgElement, 0, 0);
                 drawLegend(ctx, canvas, item.customLegend);
-                
                 canvas.toBlob((blob) => resolve(blob), 'image/webp', item.quality);
             });
         }
@@ -461,21 +420,6 @@
                 input.addEventListener('input', (e) => {
                     const idx = e.target.dataset.index;
                     imageFiles[idx].customName = e.target.value;
-                });
-            });
-
-            // Eventos para título y descripción
-            document.querySelectorAll('.title-input').forEach(input => {
-                input.addEventListener('input', (e) => {
-                    const idx = e.target.dataset.index;
-                    imageFiles[idx].customTitle = e.target.value;
-                });
-            });
-
-            document.querySelectorAll('.desc-input').forEach(textarea => {
-                textarea.addEventListener('input', (e) => {
-                    const idx = e.target.dataset.index;
-                    imageFiles[idx].customDescription = e.target.value;
                 });
             });
 
