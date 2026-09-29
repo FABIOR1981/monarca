@@ -646,3 +646,14 @@ footer {
         padding: 2rem 1.5rem;
     }
 }
+
+.logo {
+    display: flex;
+    align-items: center; /* Esto asegura que el logo quede centrado verticalmente */
+}
+
+.logo img {
+    max-height: 60px; /* Ajusta este valor (ej. 50px o 70px) hasta que lo veas perfecto */
+    width: auto;      /* Mantiene las proporciones originales para que no se deforme */
+    display: block;
+}
