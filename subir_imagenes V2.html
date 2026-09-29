@@ -41,12 +41,12 @@
                     <select id="globalCategory" class="border rounded px-2 py-1.5 text-sm focus-ring" style="border-color:#D8D3C8; color:var(--primary-dark);"></select>
                 </div>
                 <div>
-                    <label for="globalMaxWidth" class="text-sm font-medium block mb-1" style="color:var(--text-muted);">Ancho Máx. (Redimensión)</label>
+                    <label for="globalMaxWidth" class="text-sm font-medium block mb-1" style="color:var(--text-muted);">Ancho Máx. (px)</label>
                     <select id="globalMaxWidth" class="border rounded px-2 py-1.5 text-sm focus-ring" style="border-color:#D8D3C8; color:var(--primary-dark);">
                         <option value="800">800 px (Liviana)</option>
                         <option value="1200" selected>1200 px (Estándar)</option>
-                        <option value="1600">1600 px (Intermedia / Destacada)</option>
-                        <option value="1920">1920 px (Alta / Full HD)</option>
+                        <option value="1600">1600 px (Intermedia)</option>
+                        <option value="1920">1920 px (Alta / HD)</option>
                         <option value="0">Original (Sin redimensionar)</option>
                     </select>
                 </div>
@@ -66,7 +66,7 @@
         </header>
 
         <p class="text-sm mb-8" style="color:var(--text-main);">
-            Configurá el ancho máximo de bajada de resolución según tus necesidades. Cada tarjeta mostrará el peso original de tu archivo y el peso optimizado resultante.
+            Ajusta los píxeles máximos y la barra de compresión según prefieras. Cada tarjeta calculará automáticamente el peso final resultante frente al original.
         </p>
 
         <!-- Zona de Carga -->
@@ -204,6 +204,9 @@
 
         globalQuality.addEventListener('input', (e) => {
             qualityVal.textContent = e.target.value;
+            const q = parseInt(e.target.value) / 100;
+            imageFiles.forEach(item => { item.quality = q; });
+            imageFiles.forEach((_, idx) => drawPreviewAndMeasure(idx));
         });
 
         globalMaxWidth.addEventListener('change', () => {
@@ -263,12 +266,6 @@
         globalKeepOriginal.addEventListener('change', () => {
             const val = globalKeepOriginal.checked;
             imageFiles.forEach(item => { item.keepOriginal = val; });
-            renderCards();
-        });
-
-        globalQuality.addEventListener('change', () => {
-            const q = parseInt(globalQuality.value) / 100;
-            imageFiles.forEach(item => { item.quality = q; });
             renderCards();
         });
 
@@ -367,6 +364,7 @@
                                 <select data-index="${index}" class="card-maxwidth-select w-full border rounded px-2 py-1 text-sm focus-ring" style="border-color:#D8D3C8;">
                                     <option value="800" ${item.maxWidth === 800 ? 'selected' : ''}>800 px</option>
                                     <option value="1200" ${item.maxWidth === 1200 ? 'selected' : ''}>1200 px</option>
+                                    <option value="1600" ${item.maxWidth === 1600 ? 'selected' : ''}>1600 px</option>
                                     <option value="1920" ${item.maxWidth === 1920 ? 'selected' : ''}>1920 px</option>
                                     <option value="0" ${item.maxWidth === 0 ? 'selected' : ''}>Original</option>
                                 </select>
