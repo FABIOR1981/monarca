@@ -110,7 +110,7 @@
         const qualityVal = document.getElementById('qualityVal');
         const globalMaxWidth = document.getElementById('globalMaxWidth');
         const maxWidthVal = document.getElementById('maxWidthVal');
-        
+
         const batchActions = document.getElementById('batchActions');
         const counterText = document.getElementById('counterText');
         const downloadAllBtn = document.getElementById('downloadAllBtn');
@@ -243,6 +243,8 @@
                             originalName: rawName,
                             customName: 'imagen',
                             category: defaultFolder,
+                            customTitle: '',
+                            customDescription: '',
                             customLegend: '',
                             dateStr: getFormattedDate(fileDate),
                             quality: parseInt(globalQuality.value) / 100
@@ -343,6 +345,16 @@
                             <input type="text" value="${item.customName}" data-index="${index}" placeholder="Nombre corto..." class="custom-name-input w-full border rounded px-2 py-1 text-sm focus-ring" style="border-color:#D8D3C8;">
                         `}
 
+                        <!-- CAMPOS DE TÍTULO Y DESCRIPCIÓN RESTAURADOS -->
+                        <div>
+                            <label class="text-sm block mb-1" style="color:var(--text-muted);">Título visible:</label>
+                            <input type="text" value="${item.customTitle || ''}" data-index="${index}" placeholder="Ej: Jardín principal" class="title-input w-full border rounded px-2 py-1 text-sm focus-ring" style="border-color:#D8D3C8;">
+                        </div>
+                        <div>
+                            <label class="text-sm block mb-1" style="color:var(--text-muted);">Descripción:</label>
+                            <textarea data-index="${index}" placeholder="Breve descripción de la foto..." class="desc-input w-full border rounded px-2 py-1 text-sm focus-ring resize-none h-16" style="border-color:#D8D3C8;">${item.customDescription || ''}</textarea>
+                        </div>
+
                         <div class="grid grid-cols-2 gap-2 mt-1">
                             <div>
                                 <label class="text-sm" style="color:var(--text-muted);">Carpeta:</label>
@@ -351,8 +363,8 @@
                                 </select>
                             </div>
                             <div>
-                                <label class="text-sm" style="color:var(--text-muted);">Leyenda:</label>
-                                <input type="text" value="${item.customLegend}" data-index="${index}" placeholder="Sin leyenda (opcional)" class="legend-input w-full border rounded px-2 py-1 text-sm focus-ring" style="border-color:#D8D3C8;">
+                                <label class="text-sm" style="color:var(--text-muted);">Leyenda (en imagen):</label>
+                                <input type="text" value="${item.customLegend}" data-index="${index}" placeholder="Sin leyenda" class="legend-input w-full border rounded px-2 py-1 text-sm focus-ring" style="border-color:#D8D3C8;">
                             </div>
                         </div>
                         <div class="text-sm truncate mt-1 p-1.5 rounded border flex justify-between items-center" style="background:#F9F8F6; border-color:#E7E3DC; color:var(--primary-dark);">
@@ -449,6 +461,21 @@
                 input.addEventListener('input', (e) => {
                     const idx = e.target.dataset.index;
                     imageFiles[idx].customName = e.target.value;
+                });
+            });
+
+            // Eventos para título y descripción
+            document.querySelectorAll('.title-input').forEach(input => {
+                input.addEventListener('input', (e) => {
+                    const idx = e.target.dataset.index;
+                    imageFiles[idx].customTitle = e.target.value;
+                });
+            });
+
+            document.querySelectorAll('.desc-input').forEach(textarea => {
+                textarea.addEventListener('input', (e) => {
+                    const idx = e.target.dataset.index;
+                    imageFiles[idx].customDescription = e.target.value;
                 });
             });
 
