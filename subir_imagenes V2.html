@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestor de Imágenes — Residencial Monarca</title>
+    <title>Subir Imágenes — Residencial Monarca</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -32,13 +32,17 @@
     <div class="max-w-6xl mx-auto">
         <header class="mb-6 border-b pb-5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4" style="border-color:#E7E3DC;">
             <div>
-                <h1 class="text-3xl font-bold tracking-tight" style="color:var(--primary-dark);">Gestor de Imágenes</h1>
-                <p class="text-sm mt-1" style="color:var(--text-muted);">El lugar único para optimizar y subir fotos de <strong>Residencial Monarca</strong> a Cloudinary</p>
+                <h1 class="text-3xl font-bold tracking-tight" style="color:var(--primary-dark);">Subir de Imágenes</h1>
+                <p class="text-sm mt-1" style="color:var(--text-muted);">El lugar único para optimizar y subir fotos de <strong>Residencial Monarca</strong></p>
             </div>
             <div class="flex flex-wrap items-end gap-4 bg-white p-3 rounded-xl border" style="border-color:#E7E3DC;">
                 <div>
                     <label for="globalCategory" class="text-sm font-medium block mb-1" style="color:var(--text-muted);">Carpeta por defecto para lo próximo que cargues</label>
                     <select id="globalCategory" class="border rounded px-2 py-1.5 text-sm focus-ring" style="border-color:#D8D3C8; color:var(--primary-dark);"></select>
+                </div>
+                <div>
+                    <label for="globalTitle" class="text-sm font-medium block mb-1" style="color:var(--text-muted);">Título para las próximas imágenes</label>
+                    <input type="text" id="globalTitle" placeholder="Ej.: Fiesta de fin de año 2026" class="border rounded px-2 py-1.5 text-sm focus-ring" style="border-color:#D8D3C8; color:var(--primary-dark);">
                 </div>
                 <div class="flex items-center gap-2 border-l pl-4" style="border-color:#E7E3DC;">
                     <input type="checkbox" id="globalKeepOriginal" checked class="w-4 h-4 cursor-pointer" style="accent-color:var(--accent);">
@@ -90,11 +94,13 @@
         <div id="cardsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
     </div>
 
+    <script src="js/config.js"></script>
     <script>
-        // --- Configuración fija del proyecto Monarca ---
-        const CLOUD_NAME = 'p0qlmlor';
-        const UPLOAD_PRESET = 'subir_gestor';
-        const BASE_FOLDER = 'monarca';
+        // --- Configuración de Cloudinary: se define en js/config.js (no editable desde la UI) ---
+        const cfgCloudinary = (typeof CONFIG !== 'undefined' && CONFIG.CLOUDINARY) ? CONFIG.CLOUDINARY : {};
+        const CLOUD_NAME = cfgCloudinary.CLOUD_NAME;
+        const UPLOAD_PRESET = cfgCloudinary.UPLOAD_PRESET;
+        const BASE_FOLDER = cfgCloudinary.CARPETA_BASE;
         const NEW_FOLDER_OPTION = '__nueva__';
         const LAST_FOLDER_KEY = 'monarca_ultima_carpeta_v1';
         const MAX_WIDTH = 1200; // Límite máximo de ancho en píxeles
@@ -102,6 +108,7 @@
         const fileInput = document.getElementById('fileInput');
         const cardsContainer = document.getElementById('cardsContainer');
         const globalCategory = document.getElementById('globalCategory');
+        const globalTitle = document.getElementById('globalTitle');
         const globalKeepOriginal = document.getElementById('globalKeepOriginal');
         const globalQuality = document.getElementById('globalQuality');
         const qualityVal = document.getElementById('qualityVal');
@@ -110,6 +117,7 @@
         const downloadAllBtn = document.getElementById('downloadAllBtn');
         const uploadAllBtn = document.getElementById('uploadAllBtn');
 
+        // --- Subcarpetas conocidas (recordadas en este navegador) ---
         const FOLDERS_KEY = 'monarca_subcarpetas_v1';
         const DEFAULT_FOLDERS = [
             { value: 'galeria', label: 'Galería' },
@@ -132,7 +140,8 @@
         function getLastFolder() {
             const last = localStorage.getItem(LAST_FOLDER_KEY);
             const folders = loadFolders();
-            return (last && folders.find(f => f.value === last)) ? last : folders[0].value;
+            const defaultFolder = cfgCloudinary.CARPETA_DEFAULT || folders[0].value;
+            return (last && folders.find(f => f.value === last)) ? last : defaultFolder;
         }
 
         function setLastFolder(value) {
@@ -222,7 +231,8 @@
                             originalName: rawName,
                             customName: 'imagen',
                             category: defaultFolder,
-                            customLegend: '',
+                            customTitle: globalTitle.value.trim(),
+                            customDescription: '',
                             dateStr: getFormattedDate(fileDate),
                             quality: parseInt(globalQuality.value) / 100
                         };
@@ -275,11 +285,21 @@
             return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
         }
 
+        function escapeHtml(value) {
+            return String(value).replace(/[&<>'"]/g, character => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                "'": '&#39;',
+                '"': '&quot;'
+            }[character]));
+        }
+
         function getFinalName(item) {
             return item.keepOriginal ? item.originalName : `${item.dateStr}_${item.customName || 'imagen'}`;
         }
 
-        // Función auxiliar para calcular las dimensiones con tope de 1200px manteniendo la proporción
+        // Función para escalar dimensiones con tope de 1200px manteniendo proporción
         function getScaledDimensions(img) {
             let width = img.naturalWidth;
             let height = img.naturalHeight;
@@ -334,9 +354,14 @@
                                     ${buildFolderOptionsHtml(item.category)}
                                 </select>
                             </div>
-                            <div>
-                                <label class="text-sm" style="color:var(--text-muted);">Leyenda:</label>
-                                <input type="text" value="${item.customLegend}" data-index="${index}" placeholder="Sin leyenda (opcional)" class="legend-input w-full border rounded px-2 py-1 text-sm focus-ring" style="border-color:#D8D3C8;">
+                            <div></div>
+                            <div class="col-span-2">
+                                <label class="text-sm" style="color:var(--text-muted);">Título:</label>
+                                <input type="text" value="${escapeHtml(item.customTitle)}" data-index="${index}" placeholder="Título de la actividad" class="title-input w-full border rounded px-2 py-1 text-sm focus-ring" style="border-color:#D8D3C8;">
+                            </div>
+                            <div class="col-span-2">
+                                <label class="text-sm" style="color:var(--text-muted);">Descripción:</label>
+                                <textarea data-index="${index}" placeholder="Descripción de esta imagen (opcional)" class="description-input w-full border rounded px-2 py-1 text-sm focus-ring" rows="2" style="border-color:#D8D3C8;">${escapeHtml(item.customDescription)}</textarea>
                             </div>
                         </div>
                         <div class="text-sm truncate mt-1 p-1.5 rounded border flex justify-between items-center" style="background:#F9F8F6; border-color:#E7E3DC; color:var(--primary-dark);">
@@ -372,7 +397,6 @@
             canvas.height = height;
 
             ctx.drawImage(item.imgElement, 0, 0, width, height);
-            drawLegend(ctx, canvas, item.customLegend);
 
             canvas.toBlob((blob) => {
                 const badge = document.getElementById(`size-badge-${index}`);
@@ -387,29 +411,6 @@
             }, 'image/webp', item.quality);
         }
 
-        function drawLegend(ctx, canvas, legend) {
-            if (!legend || legend.trim() === '') return;
-            const fontSize = Math.max(16, Math.floor(canvas.height * 0.04));
-            ctx.font = `bold ${fontSize}px sans-serif`;
-            ctx.fillStyle = "rgba(44, 53, 45, 0.72)";
-
-            const textMetrics = ctx.measureText(legend);
-            const padding = fontSize * 0.8;
-            const boxWidth = textMetrics.width + (padding * 2);
-            const boxHeight = fontSize * 1.6;
-            const x = (canvas.width - boxWidth) / 2;
-            const y = canvas.height - boxHeight - (fontSize * 0.8);
-
-            ctx.beginPath();
-            ctx.roundRect(x, y, boxWidth, boxHeight, 8);
-            ctx.fill();
-
-            ctx.fillStyle = "#ffffff";
-            ctx.textAlign = "center";
-            ctx.textBaseline = "middle";
-            ctx.fillText(legend, canvas.width / 2, y + (boxHeight / 2));
-        }
-
         function buildProcessedBlob(item) {
             return new Promise((resolve) => {
                 const canvas = document.createElement('canvas');
@@ -418,7 +419,6 @@
                 canvas.width = width;
                 canvas.height = height;
                 ctx.drawImage(item.imgElement, 0, 0, width, height);
-                drawLegend(ctx, canvas, item.customLegend);
                 canvas.toBlob((blob) => resolve(blob), 'image/webp', item.quality);
             });
         }
@@ -439,11 +439,17 @@
                 });
             });
 
-            document.querySelectorAll('.legend-input').forEach(input => {
+            document.querySelectorAll('.title-input').forEach(input => {
                 input.addEventListener('input', (e) => {
                     const idx = e.target.dataset.index;
-                    imageFiles[idx].customLegend = e.target.value;
-                    drawPreviewAndMeasure(idx);
+                    imageFiles[idx].customTitle = e.target.value;
+                });
+            });
+
+            document.querySelectorAll('.description-input').forEach(input => {
+                input.addEventListener('input', (e) => {
+                    const idx = e.target.dataset.index;
+                    imageFiles[idx].customDescription = e.target.value;
                 });
             });
 
@@ -518,6 +524,9 @@
             }
 
             try {
+                if (!CLOUD_NAME || !UPLOAD_PRESET || !BASE_FOLDER) {
+                    throw new Error('Falta configuración de Cloudinary en js/config.js (CLOUD_NAME, UPLOAD_PRESET y CARPETA_BASE).');
+                }
                 const blob = await buildProcessedBlob(item);
                 const finalName = getFinalName(item);
 
@@ -527,6 +536,15 @@
                 formData.append('public_id', finalName);
                 formData.append('folder', folderPath);
                 formData.append('tags', tag);
+                const title = (item.customTitle || '').trim().replace(/[|]/g, ' ');
+                const description = (item.customDescription || '').trim().replace(/[|]/g, ' ');
+                const context = [
+                    title ? `caption=${title}` : '',
+                    description ? `alt=${description}` : ''
+                ].filter(Boolean).join('|');
+                if (context) {
+                    formData.append('context', context);
+                }
 
                 const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, {
                     method: 'POST',
