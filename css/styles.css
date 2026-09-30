@@ -103,7 +103,7 @@ nav a:hover {
 /* Hero Section */
 .hero {
     height: 100vh;
-    background: linear-gradient(rgba(44, 53, 45, 0.5), rgba(44, 53, 45, 0.6)), url('../img/instalaciones/fachada.webp') center/cover no-repeat;
+    background: linear-gradient(rgba(44, 53, 45, 0.5), rgba(44, 53, 45, 0.6)), url('https://res.cloudinary.com/p0qlmlor/image/upload/q_auto,f_auto,w_1200/v1/monarca/instalaciones/fachada.webp') center/cover no-repeat;
     display: flex;
     align-items: center;
     justify-content: center;
