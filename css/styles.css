@@ -685,4 +685,18 @@ footer {
 }
 
 
+.content-subtitle {
+    color: var(--primary);
+    font-size: 1.1rem;
+    font-weight: bold;
+    margin-bottom: 0.8rem;
+    font-family: var(--font-heading);
+}
 
+.content-subtitle-spaced {
+    color: var(--primary);
+    font-size: 1.1rem;
+    font-weight: bold;
+    margin: 1.5rem 0 0.8rem 0;
+    font-family: var(--font-heading);
+}
