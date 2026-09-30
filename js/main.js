@@ -258,13 +258,13 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll(`[data-config="${clave}"]`).forEach(el => { el.href = url; });
     }
 
-    // Enlace normal de WhatsApp (para botones de texto o secciones)
-    asignarEnlace('whatsapp', cfgContacto.WHATSAPP_NUMERO && `https://wa.me/${cfgContacto.WHATSAPP_NUMERO}`);
+    // Enlace normal de WhatsApp (para botones de texto o secciones) — con el mismo mensaje predeterminado
+    const mensajeWhatsapp = "Hola, quiero consultar sobre los servicios de Residencial Monarca";
+    asignarEnlace('whatsapp', cfgContacto.WHATSAPP_NUMERO && `https://wa.me/${cfgContacto.WHATSAPP_NUMERO}?text=${encodeURIComponent(mensajeWhatsapp)}`);
 
-    // Enlace específico para el Botón Flotante con mensaje predeterminado
+    // Enlace específico para el Botón Flotante con el mismo mensaje predeterminado
     if (cfgContacto.WHATSAPP_NUMERO) {
-        const mensajeFlotante = "Hola, quiero consultar sobre los servicios de Residencial Monarca";
-        const urlWhatsappFlotante = `https://wa.me/${cfgContacto.WHATSAPP_NUMERO}?text=${encodeURIComponent(mensajeFlotante)}`;
+        const urlWhatsappFlotante = `https://wa.me/${cfgContacto.WHATSAPP_NUMERO}?text=${encodeURIComponent(mensajeWhatsapp)}`;
         asignarEnlace('whatsapp-flotante', urlWhatsappFlotante);
     }
 
