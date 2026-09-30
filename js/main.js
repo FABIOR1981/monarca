@@ -50,9 +50,21 @@ document.addEventListener('DOMContentLoaded', () => {
         return 'all'; 
     }
 
-    // 2. Cargar Instalaciones Dinámicas desde Cloudinary (con metadato de área)
+    function obtenerOrden(imagen) {
+        const orden = imagen.context?.custom?.orden;
+        return orden && !isNaN(orden) ? parseInt(orden, 10) : 99;
+    }
+
+    // 2. Cargar Instalaciones Dinámicas desde Cloudinary (con orden y filtros automáticos)
     const instalacionesDinamicas = document.getElementById('instalaciones-dinamicas');
+    const contenedorFiltros = document.getElementById('instalaciones-filtros');
     const tagInstalaciones = cfgCloudinary.TAG_INSTALACIONES;
+
+    const nombresAmigables = {
+        'exterior': 'Exterior',
+        'interior': 'Áreas Comunes',
+        'habitacion': 'Habitaciones'
+    };
 
     if (instalacionesDinamicas && cloudName && tagInstalaciones) {
         fetch(`https://res.cloudinary.com/${cloudName}/image/list/${tagInstalaciones}.json`)
@@ -66,6 +78,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (imagenes.length === 0) {
                     instalacionesDinamicas.innerHTML = '<p style="grid-column: 1 / -1; text-align: center; color: var(--text-muted);">Próximamente más información sobre instalaciones.</p>';
                     return;
+                }
+
+                // Ordenar las imágenes según el metadato "orden"
+                imagenes.sort((a, b) => obtenerOrden(a) - obtenerOrden(b));
+
+                // Extraer áreas únicas de los metadatos para los filtros dinámicos
+                const areasUnicas = [...new Set(imagenes.map(img => obtenerArea(img)).filter(area => area !== 'all'))];
+
+                if (contenedorFiltros) {
+                    let htmlBotones = `<button class="filter-btn active" data-filter="all">Todas</button>`;
+                    
+                    areasUnicas.forEach(area => {
+                        const nombreVisible = nombresAmigables[area] || (area.charAt(0).toUpperCase() + area.slice(1));
+                        htmlBotones += `<button class="filter-btn" data-filter="${area}">${nombreVisible}</button>`;
+                    });
+                    
+                    contenedorFiltros.innerHTML = htmlBotones;
                 }
 
                 const htmlInstalaciones = imagenes.map(img => {
@@ -87,7 +116,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 instalacionesDinamicas.innerHTML = htmlInstalaciones;
                 
-                // Activar los filtros de instalaciones una vez renderizadas
                 inicializarFiltrosInstalaciones();
                 inicializarLightbox();
             })
@@ -98,13 +126,13 @@ document.addEventListener('DOMContentLoaded', () => {
             });
     }
 
-    // Lógica de Filtrado de Instalaciones
+    // Lógica de Filtrado de Instalaciones (dinámica)
     function inicializarFiltrosInstalaciones() {
-        const filterBtns = document.querySelectorAll('.filter-btn');
+        const filterBtns = document.querySelectorAll('#instalaciones-filtros .filter-btn');
         
         filterBtns.forEach(btn => {
             btn.addEventListener('click', () => {
-                const currentActive = document.querySelector('.filter-btn.active');
+                const currentActive = document.querySelector('#instalaciones-filtros .filter-btn.active');
                 if (currentActive) currentActive.classList.remove('active');
                 btn.classList.add('active');
 
