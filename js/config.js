@@ -16,7 +16,7 @@ const CONFIG = {
   // --- Contacto y redes ---
   CONTACTO: {
     DIRECCION: 'Rivera 5734 esquina Vicente Rocafuerte',
-    WHATSAPP_NUMERO: '',  
+    WHATSAPP_NUMERO: '59899081886',  
     INSTAGRAM_URL: 'https://www.instagram.com/recidencialmonarca?utm_source=qr',    
     FACEBOOK_URL: ''      
   }
