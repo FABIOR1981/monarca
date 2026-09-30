@@ -250,7 +250,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 6. Datos de contacto y redes desde config.js
+    // 6. Datos de contacto, redes y Widget Flotante de WhatsApp desde config.js
     const cfgContacto = (typeof CONFIG !== 'undefined' && CONFIG.CONTACTO) ? CONFIG.CONTACTO : {};
 
     function asignarEnlace(clave, url) {
@@ -258,21 +258,59 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll(`[data-config="${clave}"]`).forEach(el => { el.href = url; });
     }
 
-    // Enlace normal de WhatsApp (para botones comunes)
+    // Enlaces estáticos comunes (botones en secciones de contacto)
     asignarEnlace('whatsapp', cfgContacto.WHATSAPP_NUMERO && `https://wa.me/${cfgContacto.WHATSAPP_NUMERO}`);
-
-    // Enlace específico para el Botón Flotante con mensaje predeterminado
-    if (cfgContacto.WHATSAPP_NUMERO) {
-        const mensajeFlotante = "Hola, quiero consultar sobre los servicios de Residencial Monarca";
-        const urlWhatsappFlotante = `https://wa.me/${cfgContacto.WHATSAPP_NUMERO}?text=${encodeURIComponent(mensajeFlotante)}`;
-        asignarEnlace('whatsapp-flotante', urlWhatsappFlotante);
-    }
-
     asignarEnlace('instagram', cfgContacto.INSTAGRAM_URL);
     asignarEnlace('facebook', cfgContacto.FACEBOOK_URL);
 
     if (cfgContacto.DIRECCION) {
         document.querySelectorAll('[data-config="direccion"]').forEach(el => { el.textContent = cfgContacto.DIRECCION; });
         asignarEnlace('mapa', `https://maps.google.com/?q=${encodeURIComponent(cfgContacto.DIRECCION)}`);
+    }
+
+    // Widget Flotante Desplegable de WhatsApp
+    if (cfgContacto.WHATSAPP_NUMERO && !document.getElementById('whatsapp-widget-container')) {
+        const mensajePredeterminado = "Hola, quiero consultar sobre los servicios de Residencial Monarca";
+        const urlWhatsapp = `https://wa.me/${cfgContacto.WHATSAPP_NUMERO}?text=${encodeURIComponent(mensajePredeterminado)}`;
+
+        const widgetContainer = document.createElement("div");
+        widgetContainer.id = "whatsapp-widget-container";
+        widgetContainer.innerHTML = `
+            <div id="whatsapp-chat-box" class="whatsapp-chat-box">
+                <div class="whatsapp-chat-header">
+                    <div class="info">
+                        <h4>Residencial Monarca</h4>
+                        <span>● En línea</span>
+                    </div>
+                    <button id="whatsapp-close-chat" class="close-btn">&times;</button>
+                </div>
+                <div class="whatsapp-chat-body">
+                    <div class="whatsapp-chat-message">
+                        ¡Hola! ¿En qué podemos ayudarte hoy? Escríbenos por aquí.
+                    </div>
+                </div>
+                <div class="whatsapp-chat-footer">
+                    <a href="${urlWhatsapp}" target="_blank" class="whatsapp-chat-btn">Iniciar chat</a>
+                </div>
+            </div>
+
+            <button id="whatsapp-float-toggle" class="whatsapp-float" aria-label="Abrir chat de WhatsApp">
+                <i class="fab fa-whatsapp"></i>
+            </button>
+        `;
+
+        document.body.appendChild(widgetContainer);
+
+        const floatBtn = document.getElementById('whatsapp-float-toggle');
+        const chatBox = document.getElementById('whatsapp-chat-box');
+        const closeBtn = document.getElementById('whatsapp-close-chat');
+
+        floatBtn.addEventListener('click', () => {
+            chatBox.classList.toggle('active');
+        });
+
+        closeBtn.addEventListener('click', () => {
+            chatBox.classList.remove('active');
+        });
     }
 });
