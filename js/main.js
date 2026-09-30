@@ -8,7 +8,6 @@ document.addEventListener('DOMContentLoaded', () => {
             navList.classList.toggle('active');
         });
 
-        // Cerrar el menú al elegir una opción (en mobile no se colapsaba solo)
         navList.querySelectorAll('a').forEach(link => {
             link.addEventListener('click', () => {
                 navList.classList.remove('active');
@@ -16,35 +15,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 2. Filtrado de Galería (Instalaciones)
-    const filterBtns = document.querySelectorAll('.filter-btn');
-    
-    filterBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            const currentActive = document.querySelector('.filter-btn.active');
-            if (currentActive) currentActive.classList.remove('active');
-            btn.classList.add('active');
-
-            const filterValue = btn.getAttribute('data-filter');
-            // Filtrar solo dentro de instalaciones para no afectar la galería dinámica
-            const instalacionesItems = document.querySelectorAll('#instalaciones .gallery-item');
-
-            instalacionesItems.forEach(item => {
-                if (filterValue === 'all' || item.getAttribute('data-category') === filterValue) {
-                    item.style.display = 'block';
-                } else {
-                    item.style.display = 'none';
-                }
-            });
-        });
-    });
-
-    // 3. Cargar Galería Dinámica desde Cloudinary
-    const galeriaDinamica = document.getElementById('galeria-dinamica');
-    // Los datos de Cloudinary se definen en js/config.js
+    // Configuración general de Cloudinary
     const cfgCloudinary = (typeof CONFIG !== 'undefined' && CONFIG.CLOUDINARY) ? CONFIG.CLOUDINARY : {};
     const cloudName = cfgCloudinary.CLOUD_NAME;
-    const tag = cfgCloudinary.TAG_GALERIA;
 
     function escaparHtml(texto) {
         return String(texto).replace(/[&<>'"]/g, caracter => ({
@@ -61,18 +34,102 @@ document.addEventListener('DOMContentLoaded', () => {
         if (titulo && titulo.trim()) return titulo.trim();
 
         const nombre = imagen.public_id.split('/').pop().replace(/[-_]+/g, ' ').trim();
-        return nombre ? nombre.charAt(0).toUpperCase() + nombre.slice(1) : 'Actividad en Monarca';
+        return nombre ? nombre.charAt(0).toUpperCase() + nombre.slice(1) : 'Monarca';
     }
 
     function obtenerDescripcion(imagen) {
         const descripcion = imagen.context?.custom?.alt;
         return descripcion && descripcion.trim() ? descripcion.trim() : '';
     }
-    
-    if (galeriaDinamica && cloudName && tag) {
-        fetch(`https://res.cloudinary.com/${cloudName}/image/list/${tag}.json`)
+
+    function obtenerArea(imagen) {
+        const area = imagen.context?.custom?.area;
+        if (area && area.trim()) {
+            return area.trim().toLowerCase();
+        }
+        return 'all'; 
+    }
+
+    // 2. Cargar Instalaciones Dinámicas desde Cloudinary (con metadato de área)
+    const instalacionesDinamicas = document.getElementById('instalaciones-dinamicas');
+    const tagInstalaciones = cfgCloudinary.TAG_INSTALACIONES;
+
+    if (instalacionesDinamicas && cloudName && tagInstalaciones) {
+        fetch(`https://res.cloudinary.com/${cloudName}/image/list/${tagInstalaciones}.json`)
             .then(response => {
-                if (!response.ok) throw new Error("No se pudo obtener la lista de Cloudinary. Verifica el Tag o la opción 'Resource list' en Security.");
+                if (!response.ok) throw new Error("No se pudo obtener la lista de instalaciones de Cloudinary.");
+                return response.json();
+            })
+            .then(data => {
+                const imagenes = data.resources || [];
+
+                if (imagenes.length === 0) {
+                    instalacionesDinamicas.innerHTML = '<p style="grid-column: 1 / -1; text-align: center; color: var(--text-muted);">Próximamente más información sobre instalaciones.</p>';
+                    return;
+                }
+
+                const htmlInstalaciones = imagenes.map(img => {
+                    const urlImagen = `https://res.cloudinary.com/${cloudName}/image/upload/q_auto,f_auto,w_1200,c_limit/v${img.version}/${img.public_id}.${img.format}`;
+                    const titulo = escaparHtml(obtenerTitulo(img));
+                    const descripcion = escaparHtml(obtenerDescripcion(img));
+                    const categoria = escaparHtml(obtenerArea(img));
+                    
+                    return `
+                        <div class="gallery-item" data-category="${categoria}">
+                            <img src="${urlImagen}" alt="${titulo}${descripcion ? `: ${descripcion}` : ''}" loading="lazy" width="1170" height="821">
+                            <div class="gallery-overlay">
+                                <h3>${titulo}</h3>
+                                ${descripcion ? `<p>${descripcion}</p>` : ''}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                
+                instalacionesDinamicas.innerHTML = htmlInstalaciones;
+                
+                // Activar los filtros de instalaciones una vez renderizadas
+                inicializarFiltrosInstalaciones();
+                inicializarLightbox();
+            })
+            .catch(error => {
+                console.error('Error cargando las instalaciones desde Cloudinary:', error);
+                instalacionesDinamicas.innerHTML = '<p style="grid-column: 1 / -1; text-align: center; color: var(--text-muted);">No se pudieron cargar las instalaciones.</p>';
+                inicializarLightbox();
+            });
+    }
+
+    // Lógica de Filtrado de Instalaciones
+    function inicializarFiltrosInstalaciones() {
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const currentActive = document.querySelector('.filter-btn.active');
+                if (currentActive) currentActive.classList.remove('active');
+                btn.classList.add('active');
+
+                const filterValue = btn.getAttribute('data-filter');
+                const instalacionesItems = document.querySelectorAll('#instalaciones .gallery-item');
+
+                instalacionesItems.forEach(item => {
+                    if (filterValue === 'all' || item.getAttribute('data-category') === filterValue) {
+                        item.style.display = 'block';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+            });
+        });
+    }
+
+    // 3. Cargar Galería Dinámica desde Cloudinary
+    const galeriaDinamica = document.getElementById('galeria-dinamica');
+    const tagGaleria = cfgCloudinary.TAG_GALERIA;
+    
+    if (galeriaDinamica && cloudName && tagGaleria) {
+        fetch(`https://res.cloudinary.com/${cloudName}/image/list/${tagGaleria}.json`)
+            .then(response => {
+                if (!response.ok) throw new Error("No se pudo obtener la lista de Cloudinary.");
                 return response.json();
             })
             .then(data => {
@@ -83,7 +140,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     return;
                 }
 
-                // Generar HTML por cada imagen aprovechando la optimización automática (q_auto, f_auto)
                 const htmlImagenes = imagenes.map(img => {
                     const urlImagen = `https://res.cloudinary.com/${cloudName}/image/upload/q_auto,f_auto,w_1200,c_limit/v${img.version}/${img.public_id}.${img.format}`;
                     const titulo = escaparHtml(obtenerTitulo(img));
@@ -91,7 +147,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     
                     return `
                         <div class="gallery-item">
-                            <img src="${urlImagen}" alt="${titulo}${descripcion ? `: ${descripcion}` : ''}" loading="lazy">
+                            <img src="${urlImagen}" alt="${titulo}${descripcion ? `: ${descripcion}` : ''}" loading="lazy" width="1170" height="821">
                             <div class="gallery-overlay">
                                 <h3>${titulo}</h3>
                                 ${descripcion ? `<p>${descripcion}</p>` : ''}
@@ -101,14 +157,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 }).join('');
                 
                 galeriaDinamica.innerHTML = htmlImagenes;
-
-                // Inicializar Lightbox después de renderizar las fotos de Cloudinary
                 inicializarLightbox();
             })
             .catch(error => {
                 console.error('Error cargando la galería desde Cloudinary:', error);
                 galeriaDinamica.innerHTML = '<p style="grid-column: 1 / -1; text-align: center; color: var(--text-muted);">Próximamente compartiremos más momentos.</p>';
-                inicializarLightbox(); // Inicializa para las fotos fijas si la API falla
+                inicializarLightbox();
             });
     } else {
         inicializarLightbox();
@@ -145,7 +199,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!lightbox || !lightboxImg || !lightboxClose) return;
 
         allGalleryItems.forEach(item => {
-            // Prevenir múltiples eventos clonando el nodo
             const nuevoItem = item.cloneNode(true);
             item.parentNode.replaceChild(nuevoItem, item);
             
@@ -169,8 +222,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 5. Datos de contacto y redes desde config.js
-    // Si un valor está vacío, se deja el enlace/texto que ya trae index.html.
+    // 6. Datos de contacto y redes desde config.js
     const cfgContacto = (typeof CONFIG !== 'undefined' && CONFIG.CONTACTO) ? CONFIG.CONTACTO : {};
 
     function asignarEnlace(clave, url) {
