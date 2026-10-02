@@ -126,26 +126,23 @@ document.addEventListener('DOMContentLoaded', () => {
             });
     }
 
-    // Lógica de Filtrado de Instalaciones (dinámica)
+    // Lógica de Filtrado de Instalaciones (delegación de eventos: funciona con botones fijos o generados)
     function inicializarFiltrosInstalaciones() {
-        const filterBtns = document.querySelectorAll('#instalaciones-filtros .filter-btn');
-        
-        filterBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                const currentActive = document.querySelector('#instalaciones-filtros .filter-btn.active');
-                if (currentActive) currentActive.classList.remove('active');
-                btn.classList.add('active');
+        const contenedor = document.getElementById('instalaciones-filtros');
+        if (!contenedor || contenedor.dataset.filtrosListos === '1') return;
+        contenedor.dataset.filtrosListos = '1';
 
-                const filterValue = btn.getAttribute('data-filter');
-                const instalacionesItems = document.querySelectorAll('#instalaciones .gallery-item');
+        contenedor.addEventListener('click', (e) => {
+            const btn = e.target.closest('.filter-btn');
+            if (!btn || !contenedor.contains(btn)) return;
 
-                instalacionesItems.forEach(item => {
-                    if (filterValue === 'all' || item.getAttribute('data-category') === filterValue) {
-                        item.style.display = 'block';
-                    } else {
-                        item.style.display = 'none';
-                    }
-                });
+            contenedor.querySelectorAll('.filter-btn.active').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            const filtro = btn.getAttribute('data-filter');
+            document.querySelectorAll('#instalaciones-dinamicas .gallery-item').forEach(item => {
+                const visible = filtro === 'all' || item.getAttribute('data-category') === filtro;
+                item.style.display = visible ? '' : 'none';
             });
         });
     }
