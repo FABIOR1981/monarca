@@ -29,12 +29,41 @@ document.addEventListener('DOMContentLoaded', () => {
         }[caracter]));
     }
 
+    // ¿El nombre del archivo es automático (fecha/hora, IMG_1234, etc.) y no sirve como título para personas?
+    function esNombreAutomatico(nombre) {
+        const soloLetras = nombre.replace(/[^a-zA-ZÁÉÍÓÚÜáéíóúüñÑ]/g, '');
+        return soloLetras.length < 3 || /^(img|dsc|dscn|pxl|photo|foto|image|imagen)[\s_-]*\d/i.test(nombre);
+    }
+
     function obtenerTitulo(imagen) {
         const titulo = imagen.context?.custom?.caption;
         if (titulo && titulo.trim()) return titulo.trim();
 
         const nombre = imagen.public_id.split('/').pop().replace(/[-_]+/g, ' ').trim();
-        return nombre ? nombre.charAt(0).toUpperCase() + nombre.slice(1) : 'Monarca';
+        if (!nombre || esNombreAutomatico(nombre)) return '';
+        return nombre.charAt(0).toUpperCase() + nombre.slice(1);
+    }
+
+    // Texto alternativo (alt) de cada foto: lo que usa Google Imágenes y los lectores de pantalla.
+    // Si la foto no tiene título ni descripción en Cloudinary, se usa un texto por defecto descriptivo.
+    function construirAlt(titulo, descripcion, porDefecto) {
+        if (titulo && descripcion) return `${titulo}: ${descripcion}`;
+        return titulo || descripcion || porDefecto;
+    }
+
+    // Tarjeta de galería: el recuadro con texto sobre la foto solo se muestra si hay algo para decir
+    function construirTarjeta(urlImagen, alt, titulo, descripcion, categoria) {
+        const atributoCategoria = categoria !== undefined ? ` data-category="${categoria}"` : '';
+        const overlay = (titulo || descripcion) ? `
+                            <div class="gallery-overlay">
+                                ${titulo ? `<h3>${titulo}</h3>` : ''}
+                                ${descripcion ? `<p>${descripcion}</p>` : ''}
+                            </div>` : '';
+        return `
+                        <div class="gallery-item"${atributoCategoria}>
+                            <img src="${urlImagen}" alt="${alt}" loading="lazy" width="1170" height="821">${overlay}
+                        </div>
+                    `;
     }
 
     function obtenerDescripcion(imagen) {
@@ -102,16 +131,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     const titulo = escaparHtml(obtenerTitulo(img));
                     const descripcion = escaparHtml(obtenerDescripcion(img));
                     const categoria = escaparHtml(obtenerArea(img));
-                    
-                    return `
-                        <div class="gallery-item" data-category="${categoria}">
-                            <img src="${urlImagen}" alt="${titulo}${descripcion ? `: ${descripcion}` : ''}" loading="lazy" width="1170" height="821">
-                            <div class="gallery-overlay">
-                                <h3>${titulo}</h3>
-                                ${descripcion ? `<p>${descripcion}</p>` : ''}
-                            </div>
-                        </div>
-                    `;
+                    const alt = construirAlt(titulo, descripcion, 'Instalaciones de Residencial Monarca, residencial geriátrico en Montevideo');
+
+                    return construirTarjeta(urlImagen, alt, titulo, descripcion, categoria);
                 }).join('');
                 
                 instalacionesDinamicas.innerHTML = htmlInstalaciones;
@@ -169,16 +191,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     const urlImagen = `https://res.cloudinary.com/${cloudName}/image/upload/q_auto,f_auto,w_1200,c_limit/v${img.version}/${img.public_id}.${img.format}`;
                     const titulo = escaparHtml(obtenerTitulo(img));
                     const descripcion = escaparHtml(obtenerDescripcion(img));
-                    
-                    return `
-                        <div class="gallery-item">
-                            <img src="${urlImagen}" alt="${titulo}${descripcion ? `: ${descripcion}` : ''}" loading="lazy" width="1170" height="821">
-                            <div class="gallery-overlay">
-                                <h3>${titulo}</h3>
-                                ${descripcion ? `<p>${descripcion}</p>` : ''}
-                            </div>
-                        </div>
-                    `;
+                    const alt = construirAlt(titulo, descripcion, 'Actividades y momentos en Residencial Monarca, Montevideo');
+
+                    return construirTarjeta(urlImagen, alt, titulo, descripcion);
                 }).join('');
                 
                 galeriaDinamica.innerHTML = htmlImagenes;
@@ -231,6 +246,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const imgElement = nuevoItem.querySelector('img');
                 if (imgElement) {
                     lightboxImg.setAttribute('src', imgElement.getAttribute('src'));
+                    lightboxImg.setAttribute('alt', imgElement.getAttribute('alt') || 'Imagen ampliada');
                     lightbox.style.display = 'flex';
                 }
             });
