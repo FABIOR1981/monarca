@@ -12,7 +12,7 @@ const CONFIG = {
 
   // --- Contacto y redes ---
   CONTACTO: {
-    DIRECCION: 'Av. Gral. Rivera 5734 esquina Vicente Rocafuerte, 11400 Montevideo, Uruguay',
+    DIRECCION: 'Rivera 5734 esquina Vicente Rocafuerte',
     WHATSAPP_NUMERO: '59899081886',  
     INSTAGRAM_URL: 'https://www.instagram.com/recidencialmonarca?utm_source=qr',    
     FACEBOOK_URL: 'https://www.facebook.com/share/1JEh8uoqEZ/?mibextid=wwXIfr'      
